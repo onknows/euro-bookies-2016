@@ -1,0 +1,14 @@
+{
+  "name": "bookies-2016-app",
+  "version": "1.0.0",
+  "description": "Place your bets on teams participating in the Eurocup 2016",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "Christophe Hesters",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "express": "^4.13.4"
+  }
+}
