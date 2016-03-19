@@ -12,12 +12,12 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-var express = require('express');
-var app = express();
-var routes = require('./app/routes');
+exports.registerRoutes = function(app) {
 
-routes.registerRoutes(app);
+    app.get('/',            function (req, res) {      res.send('Welcome to euro-bookies :) !'); });
+    app.get('/api/teams',   function (req, res) {      res.send('EKTeams'); });
+    app.get('/api/users',   function (req, res) {      res.send('BettingUsers'); });
+    app.get('/api/users/:id', function (req, res) {      res.send('BettingUser ' + req.params.id); });
 
-app.listen(8088, function () {
-    console.log('Server started at 8088!');
-});
+    console.log("registered routes");
+}
