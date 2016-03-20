@@ -18,6 +18,8 @@ var routes = require('./app/routes');
 
 routes.registerRoutes(app);
 
-app.listen(8088, function () {
-    console.log('Server started at 8088!');
+var port = process.argv[2] ? process.argv[2] : 8088;
+
+app.listen(port, function () {
+    console.log('Server started at ' + port + '!');
 });
