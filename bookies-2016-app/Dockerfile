@@ -12,10 +12,15 @@ COPY server.js ./
 COPY app ./app
 COPY node_modules ./node_modules
 
-# TODO add build time args like git-commit-id + timestamp for tracability
+# docker build time arguments that are passed to nodejs so that the rest call to /version has meaningfull data
+ARG software_version
+ARG image_build_timestamp=2016-00-00T00:00:00Z
+# expose the arguments as environment variables (these can be expanded by a shell, see CMD instruction below)
+ENV software_version ${software_version:-0000000}
+ENV image_build_timestamp ${image_build_timestamp:-2016-00-00T00:00:00Z}
 
 # server.js runs on port 8088
 EXPOSE 8088
 
 # use exec, makes node the root process (so that it receives SIGNALS)
-CMD exec node server.js
+CMD exec node server.js 8088 $software_version $image_build_timestamp
