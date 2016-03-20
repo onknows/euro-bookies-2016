@@ -39,4 +39,5 @@ The acceptance and production environments consist of:
        - browse and choose *aws-setup/aws_ansiblecc_key*
     * go to **Session** and enter ubuntu@${GROUP_ANSIBLE_IP}
 
- 3. when connected ```cd euro-bookies-2016```
+ 3. when connected to the provisioner cd to the project directory containing workshop materials ```cd euro-bookies-2016```
+ 4. follow instructions from the workshop hosts
