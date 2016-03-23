@@ -1,0 +1,13 @@
+[docker]
+172.28.128.4
+
+[db]
+172.28.128.5
+
+[buildserver]
+172.28.128.6
+
+[all:children]
+docker
+db
+buildserver

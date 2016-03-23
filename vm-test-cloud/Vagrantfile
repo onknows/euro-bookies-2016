@@ -1,0 +1,28 @@
+# creates a test cluster with 4 nodes, the ansible node can provision the other 3
+# after `vagrant up` run `get-cluster-inventory.sh` on the host os, this creates
+# a vm-test-cloud inventory file that is immediately available inside the ansible
+# node!
+
+# vagrant ssh ansible
+# cd /ansible
+# start provisioning
+
+Vagrant.configure(2) do |config|
+
+  config.vm.box = "ubuntu/trusty64"
+  config.vm.network "private_network", type: "dhcp"
+
+  config.vm.define "ansible" do | appserver |
+      appserver.vm.synced_folder "../ansible", "/ansible"
+      appserver.vm.provision "shell", path: "../aws-setup/aws-ansiblecc-setup.sh"
+  end
+
+  config.vm.define "dockervm" do | appserver |
+  end
+
+  config.vm.define "mysql" do | appserver |
+  end
+
+  config.vm.define "buildserver" do | appserver |
+  end
+end
