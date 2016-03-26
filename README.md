@@ -39,5 +39,10 @@ The acceptance and production environments consist of:
        - browse and choose *aws-setup/aws_ansiblecc_key*
     * go to **Session** and enter ubuntu@${GROUP_ANSIBLE_IP}
 
- 3. when connected to the provisioner cd to the project directory containing workshop materials ```cd euro-bookies-2016```
- 4. follow instructions from the workshop hosts
+ 3. when connected to the provisioner cd to the project directory containing workshop materials ```cd euro-bookies-2016/ansible```
+ 4. execute `setup.sh`, this scripts does the following: 
+       * execute `./download-requirements.sh` (downloads open-source Ansible roles we need)
+       * execute `ssh-keygen -t rsa` to generate a key-pair (choose all defaults, enter no password)
+       * execute `export ANSIBLE_HOST_KEY_CHECKING=False` to disable ssh known_hosts checking 
+       * execute `ansible-playbook -i <inventory-file> install-ssh-key.yml --ask-pass`
+ 5. follow instructions from the workshop hosts
