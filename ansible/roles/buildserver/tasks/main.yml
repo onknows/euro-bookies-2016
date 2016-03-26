@@ -1,0 +1,4 @@
+---
+- include: java8.yml
+- include: jenkins.yml
+#- include: geerlingguy.jenkins

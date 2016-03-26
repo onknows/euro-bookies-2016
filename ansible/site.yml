@@ -11,3 +11,8 @@
   become: yes
   roles:
     - geerlingguy.mysql
+
+- hosts: buildserver
+  become: yes
+  roles:
+    - buildserver
