@@ -1,11 +1,11 @@
 [docker]
-172.28.128.4
+172.28.128.4  ansible_user=vagrant
 
 [db]
-172.28.128.5
+172.28.128.5  ansible_user=vagrant
 
 [buildserver]
-172.28.128.6
+172.28.128.6  ansible_user=vagrant
 
 [all:children]
 docker
