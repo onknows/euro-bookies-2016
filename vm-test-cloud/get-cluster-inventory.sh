@@ -14,13 +14,13 @@ echo "creating  ../ansible/vm-test-cloud  which you can use as inventory"
 
 cat << EOF > ../ansible/vm-test-cloud
 [docker]
-$DOCKERVM_IP
+${DOCKERVM_IP::-1}  ansible_user=vagrant
 
 [db]
-$DB_IP
+${DB_IP::-1}  ansible_user=vagrant
 
 [buildserver]
-$BUILDSERVER_IP
+${BUILDSERVER_IP::-1}  ansible_user=vagrant
 
 [all:children]
 docker
