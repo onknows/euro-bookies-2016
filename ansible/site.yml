@@ -1,18 +1,4 @@
 ---
-# make sure the public key is installed, this needs to be done only once!
-#- include: install-ssh-key.yml
-
-- hosts: docker  # see the inventory file
-  become: yes    # become a sudo user when running this play!
-  roles:         # we depend on other roles
-    - angstwad.docker_ubuntu
-
-- hosts: db
-  become: yes
-  roles:
-    - geerlingguy.mysql
-
-- hosts: buildserver
-  become: yes
-  roles:
-    - buildserver
+- include: docker.yml
+- include: databases.yml
+- include: buildserver.yml
