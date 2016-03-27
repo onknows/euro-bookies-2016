@@ -14,7 +14,7 @@ Vagrant.configure(2) do |config|
 
   config.vm.define "ansible" do | appserver |
       appserver.vm.synced_folder "../ansible", "/ansible"
-      appserver.vm.provision "shell", path: "../aws-setup/aws-ansiblecc-setup.sh"
+      appserver.vm.provision "shell", path: "vm-ansiblecc-setup.sh"
   end
 
   config.vm.define "dockervm" do | appserver |
