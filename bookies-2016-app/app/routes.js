@@ -12,12 +12,36 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-exports.registerRoutes = function(app) {
+exports.registerRoutes = function(app, dao) {
 
-    app.get('/',            function (req, res) {      res.send('Welcome to euro-bookies :) !'); });
-    app.get('/api/teams',   function (req, res) {      res.send('EKTeams'); });
-    app.get('/api/users',   function (req, res) {      res.send('BettingUsers'); });
-    app.get('/api/users/:id', function (req, res) {      res.send('BettingUser ' + req.params.id); });
+    app.get('/', function (req, res) {
+        res.send('Welcome to euro-bookies :) !');
+    });
+
+    app.get('/api/teams', function (req, res) {
+        console.log("GET /api/teams")
+        dao.getAllTeams(function (jsonResult) {
+            res.writeHead(200, {'Content-Type': 'application/json'});
+            res.end(jsonResult);
+        });
+    });
+
+
+    app.get('/api/teams/:id', function (req, res) {
+        console.log("GET /api/teams/:id")
+        dao.getTeamById(req.params.id, function (jsonResult) {
+            res.writeHead(200, {'Content-Type': 'application/json'});
+            res.end(jsonResult);
+        });
+    });
+
+    app.get('/api/users', function (req, res) {
+        res.send('BettingUsers');
+    });
+
+    app.get('/api/users/:id', function (req, res) {
+        res.send('BettingUser ' + req.params.id);
+    });
 
     console.log("registered routes");
 }

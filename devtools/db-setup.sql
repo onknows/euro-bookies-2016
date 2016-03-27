@@ -1,6 +1,6 @@
-CREATE DATABASE bookies;
+-- CREATE DATABASE bookies_db;
 
-USE bookies;
+USE bookies_db;
 
 CREATE TABLE teams
 (
@@ -8,9 +8,10 @@ CREATE TABLE teams
   teamName varchar(255) NOT NULL,
   countryCode varchar(255) NOT NULL,
   PRIMARY KEY(ID)
-)
+);
 
 INSERT INTO teams (teamname, countryCode) VALUES ('Oranje', 'nl');
 INSERT INTO teams (teamname, countryCode) VALUES ('Germany', 'de');
 INSERT INTO teams (teamname, countryCode) VALUES ('Belgium', 'be');
 INSERT INTO teams (teamname, countryCode) VALUES ('Spain', 'es');
+commit;

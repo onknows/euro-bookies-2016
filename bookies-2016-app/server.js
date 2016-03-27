@@ -15,8 +15,9 @@
 var express = require('express');
 var app = express();
 var routes = require('./app/routes');
+var dao = require('./app/dao');
 
-routes.registerRoutes(app);
+routes.registerRoutes(app, dao);
 
 var port = process.argv[2] ? process.argv[2] : 8088;
 
