@@ -8,6 +8,8 @@ Small REST application which people can use to bet on EK teams, purpose is to de
    * master   -> containing the application
    * ansible  -> containing ansible materials for provisioning
 
-# Development tools
+# Repository layout
 
-   the folder **devtools** contains instructions to start a mariadb instance using docker
+  * bookies-2016-app contains the nodejs application
+  * bookies-2016-database contains the database versions, see start-mysql-docker.sh for instructions
+
