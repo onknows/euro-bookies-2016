@@ -14,7 +14,7 @@
 
 var request = require('supertest');
 var express = require('express');
-var routes  = require('../app/routes')
+var routes  = require('../app/routes');
 
 var app = express();
 

@@ -19,16 +19,15 @@ exports.registerRoutes = function(app, dao) {
     });
 
     app.get('/api/teams', function (req, res) {
-        console.log("GET /api/teams")
+        console.log("GET /api/teams");
         dao.getAllTeams(function (jsonResult) {
             res.writeHead(200, {'Content-Type': 'application/json'});
             res.end(jsonResult);
         });
     });
 
-
     app.get('/api/teams/:id', function (req, res) {
-        console.log("GET /api/teams/:id")
+        console.log("GET /api/teams/:id");
         dao.getTeamById(req.params.id, function (jsonResult) {
             res.writeHead(200, {'Content-Type': 'application/json'});
             res.end(jsonResult);
