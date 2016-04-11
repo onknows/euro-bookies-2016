@@ -14,35 +14,68 @@
 
 var mysql = require('mysql');
 
-function newConnection() {
-    return mysql.createConnection({
-        host: '172.28.128.5',
-        user: 'bookies',
-        password: 'bookies',
-        database: 'bookies_db'
-    });
-}
+/**
+ * @param host database server hostname
+ * @param user
+ * @param password
+ * @param database
+ * @constructor
+ */
+var Dao = function(host, user, password, database) {
+    this.host = host;
+    this.user = user;
+    this.password = password;
+    this.database = database;
+};
 
-exports.getAllTeams = function(callback) {
-    var connection = newConnection();
+/**
+ * Creates a new database connection
+ */
+Dao.prototype.newConnection = function newConnection() {
+    return mysql.createConnection({
+        host: this.host,
+        user: this.user,
+        password: this.password,
+        database: this.database
+    });
+};
+
+/**
+ * Gets all teams from the database
+ *
+ * @param callback a callback function that takes a String containing the JSON result
+ */
+Dao.prototype.getAllTeams = function(callback) {
+    var connection = this.newConnection();
     connection.query('SELECT id, countryCode FROM teams', function(err, rows, fields) {
         if (err) {
-            console.log('error in getAllTeams: ' + err.message)
+            console.log('error in getAllTeams: ' + err.message);
             throw err;
         }
-        callback(JSON.stringify(rows));
         connection.end();
+        callback(rows);
     });
-}
+};
 
-exports.getTeamById = function(id, callback) {
-    var connection = newConnection();
+/**
+ * Finds the team by ID
+ * @param id
+ * @param callback
+ */
+Dao.prototype.getTeamById = function(id, callback) {
+    var connection = this.newConnection();
     connection.query('SELECT * FROM teams WHERE id = ?', [id], function(err, rows, fields) {
         if (err) {
-            console.log('error in getTeamById: ' + err.message)
+            console.log('error in getTeamById: ' + err.message);
             throw err;
         }
-        callback(JSON.stringify(rows[0]));
+        if (rows.length == 0) {
+            callback(null);
+        } else {
+            callback(rows[0]);
+        }
         connection.end();
     });
-}
+};
+
+module.exports = Dao;

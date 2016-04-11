@@ -9,6 +9,7 @@ WORKDIR /src
 
 # copy the application files into the working directory
 COPY server.js ./
+COPY static ./static
 COPY app ./app
 COPY node_modules ./node_modules
 

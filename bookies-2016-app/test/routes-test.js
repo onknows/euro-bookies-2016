@@ -12,20 +12,106 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
+var sinon = require('sinon');
+var chai = require('chai');
+var expect = chai.expect;
 var request = require('supertest');
+
 var express = require('express');
-var routes  = require('../app/routes');
+var Dao = require('../app/dao');
+var routes = require('../app/routes');
 
-var app = express();
+describe('GET /api/teams', function () {
+    var dao = new Dao('bogus', 'bogus', 'bogus', 'bogus');
 
-routes.registerRoutes(app);
+    beforeEach(function () {
+        sinon.stub(dao, 'getAllTeams', function (callback) {
+            // use setTimeout to simulate async behavior
+            setTimeout(function () {
+                callback('[{id: 1, teamName: "Oranje"}, {id: 2, teamName: "Ukraine"}]');
+            }, 0);
+        });
+    });
 
-describe('GET /', function(){
-    it('responds Welcome to euro-bookies :) !', function(done){
+    afterEach(function () {
+        dao.getAllTeams.restore();
+    });
+
+    it('responds with teams Oranje and Ukraine in JSON!', function (done) {
+        var app = express();
+        routes.registerRoutes(app, dao);
         request(app)
-            .get('/')
-            .set('Accept', 'text/html')
-            .expect('Content-Type', 'text/html; charset=utf-8')
-            .expect(200, "Welcome to euro-bookies :) !", done);
-    })
+            .get('/api/teams')
+            .set('Accept', 'application/json')
+            .expect('Content-Type', 'application/json; charset=utf-8')
+            .expect(200)
+            .expect(function(res){
+                expect(res.body).to.contain("teamName: \"Oranje\"");
+                expect(res.body).to.contain("teamName: \"Ukraine\"");
+             })
+            .end(function (err, res) { if (err) throw err; done(); });
+    });
 });
+
+describe('GET /api/teams/:id', function () {
+    var dao = new Dao('bogus', 'bogus', 'bogus', 'bogus');
+
+    beforeEach(function () {
+        sinon.stub(dao, 'getTeamById', function (id, callback) {
+            // use setTimeout to simulate async behavior
+            setTimeout(function () {
+                if (id == 10) {
+                    callback(undefined);
+                } else {
+                    callback('{id: ' + id + ', teamName: "the team"}');
+                }
+            }, 0);
+        });
+    });
+
+    afterEach(function () {
+        dao.getTeamById.restore();
+    });
+
+    it('team with id 3 should return a team with id 3', function (done) {
+        var app = express();
+        routes.registerRoutes(app, dao);
+        request(app)
+            .get('/api/teams/3')
+            .set('Accept', 'application/json')
+            .expect('Content-Type', 'application/json; charset=utf-8')
+            .expect(200)
+            .expect(function(res){
+                expect(res.body).to.contain("id: 3");
+             })
+            .end(function (err, res) { if (err) throw err; done(); });
+    });
+
+    it('team with id 5 should return a team with id 5', function (done) {
+        var app = express();
+        routes.registerRoutes(app, dao);
+        request(app)
+            .get('/api/teams/5')
+            .set('Accept', 'application/json')
+            .expect('Content-Type', 'application/json; charset=utf-8')
+            .expect(200)
+            .expect(function(res){
+                expect(res.body).to.contain("id: 5");
+            })
+            .end(function (err, res) { if (err) throw err; done(); });
+    });
+
+
+    it('team with id 10 that does not exist should return 404', function (done) {
+        var app = express();
+        routes.registerRoutes(app, dao);
+        request(app)
+            .get('/api/teams/10')
+            .set('Accept', 'application/json')
+            .expect('Content-Type', 'text/html; charset=utf-8')
+            .expect(404)
+            .end(function (err, res) { if (err) throw err; done(); });
+    });
+
+});
+

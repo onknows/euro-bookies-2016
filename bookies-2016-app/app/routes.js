@@ -12,8 +12,13 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
+/**
+ * Configures the REST endpoints on app. The dao is necessary to retrieve content.
+ *
+ * @param app express instance
+ * @param dao Dao instance
+ */
 exports.registerRoutes = function(app, dao) {
-
     app.get('/', function (req, res) {
         res.send('Welcome to euro-bookies :) !');
     });
@@ -21,16 +26,18 @@ exports.registerRoutes = function(app, dao) {
     app.get('/api/teams', function (req, res) {
         console.log("GET /api/teams");
         dao.getAllTeams(function (jsonResult) {
-            res.writeHead(200, {'Content-Type': 'application/json'});
-            res.end(jsonResult);
+            res.json(jsonResult);
         });
     });
 
     app.get('/api/teams/:id', function (req, res) {
-        console.log("GET /api/teams/:id");
+        console.log("GET /api/teams/" + req.params.id);
         dao.getTeamById(req.params.id, function (jsonResult) {
-            res.writeHead(200, {'Content-Type': 'application/json'});
-            res.end(jsonResult);
+            if (jsonResult) {
+                res.json(jsonResult);
+            } else {
+                res.status(404).send("Team with id " + req.params.id + " not found");
+            }
         });
     });
 
@@ -41,6 +48,4 @@ exports.registerRoutes = function(app, dao) {
     app.get('/api/users/:id', function (req, res) {
         res.send('BettingUser ' + req.params.id);
     });
-
-    console.log("registered routes");
-}
+};

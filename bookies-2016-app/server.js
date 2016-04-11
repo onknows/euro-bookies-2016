@@ -13,14 +13,13 @@
 //    limitations under the License.
 
 var express = require('express');
-var app = express();
 var routes = require('./app/routes');
-var dao = require('./app/dao');
+var Dao = require('./app/dao');
 
+var dao = new Dao('127.0.0.1', 'root', 'root', 'bookies_db');
+var app = express();
 routes.registerRoutes(app, dao);
+app.use(express.static(__dirname + '/static'));
 
 var port = process.argv[2] ? process.argv[2] : 8088;
-
-app.listen(port, function () {
-    console.log('Server started at ' + port + '!');
-});
+app.listen(port, console.log('Server started at ' + port + '!'));
