@@ -2,7 +2,7 @@
 - hosts: buildserver
   become: yes
   vars:
-      nodejs_forever: false
+      nodejs_forever: false # forever is a process manager for nodejs, we don't need it
   roles:
   #  - { role: java, java_version: 7 }  # default java version is 8, this would override to 7
     - java
