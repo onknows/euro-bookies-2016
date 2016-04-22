@@ -2,7 +2,7 @@
 - hosts: buildserver
   become: yes
   vars:
-      nodejs_install_npm_user: ubuntu
+      nodejs_forever: false
   roles:
   #  - { role: java, java_version: 7 }  # default java version is 8, this would override to 7
     - java
