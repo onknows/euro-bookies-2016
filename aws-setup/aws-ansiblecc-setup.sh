@@ -13,5 +13,9 @@ sudo apt-get install git git-extras software-properties-common ansible -y
 echo "Cloning euro bookies ansible branch"
 git clone https://github.com/toefel18/euro-bookies-2016.git --single-branch --branch ansible
 
+sudo chown ubuntu. -R euro-bookies-2016
+
 echo "disabling ansible host checking"
 echo "export ANSIBLE_HOST_KEY_CHECKING=False" >> .bashrc
+
+sudo ansible-galaxy install -r euro-bookies-2016/ansible/requirements.yml
