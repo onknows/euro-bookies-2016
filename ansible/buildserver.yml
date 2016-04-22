@@ -6,3 +6,4 @@
     - java
     - jenkins
     - angstwad.docker_ubuntu
+    - geerlingguy.nodejs
