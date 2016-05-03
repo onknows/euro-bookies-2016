@@ -6,6 +6,8 @@
   roles:
   #  - { role: java, java_version: 7 }  # default java version is 8, this would override to 7
     - java
+    - groover.maven
     - jenkins
     - angstwad.docker_ubuntu
     - geerlingguy.nodejs
+    - george.shuklin.flyway

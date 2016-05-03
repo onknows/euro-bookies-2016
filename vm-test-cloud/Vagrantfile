@@ -18,11 +18,14 @@ Vagrant.configure(2) do |config|
   end
 
   config.vm.define "dockervm" do | appserver |
+      appserver.vm.provision "shell", path: "vm-awsnode-setup.sh"
   end
 
   config.vm.define "mysql" do | appserver |
+      appserver.vm.provision "shell", path: "vm-awsnode-setup.sh"
   end
 
   config.vm.define "buildserver" do | appserver |
+      appserver.vm.provision "shell", path: "vm-awsnode-setup.sh"
   end
 end
