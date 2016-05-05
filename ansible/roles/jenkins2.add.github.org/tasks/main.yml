@@ -1,0 +1,12 @@
+---
+- name: installing github organization of {{ repo_owner }}
+  template:
+    src: jenkins/jobs/github_organization_config/config.xml   # the file with jinja2 template directives
+    dest: /var/lib/jenkins/jobs/{{ repo_owner }}/config.xml   # the target location
+    owner: jenkins                                            # file owner
+    group: jenkins                                            # file group
+    mode: 0644                                                # rw-r--r--   (first digit is for special permissions, setuid, setgid, sticky)
+    force: no
+    create: yes
+- name: restart jenkins
+  service: name=jenkins state=restarted
