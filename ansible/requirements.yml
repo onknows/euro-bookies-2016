@@ -1,7 +1,6 @@
 # install docker role
 - src: angstwad.docker_ubuntu
-- src: groover.maven
-#- src: geerlingguy.jenkins
+- src: tecris.maven
 - src: karlmdavis.jenkins2
 - src: geerlingguy.mysql
 - src: geerlingguy.nodejs

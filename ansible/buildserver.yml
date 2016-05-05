@@ -2,15 +2,14 @@
 - hosts: buildserver
   become: yes
   vars:
-      nodejs_forever: false # forever is a process manager for nodejs, we don't need it
+      nodejs_forever: false
       #jenkins_plugins_extra:
       #    -
   roles:
-  #  - { role: java, java_version: 7 }  # default java version is 8, this would override to 7
     - java
-    - groover.maven
+    - tecris.maven
     - geerlingguy.nodejs
-      #  - geerlingguy.jenkins
     - angstwad.docker_ubuntu
-    - karlmdavis.jenkins2
     - george.shuklin.flyway
+    - jenkins2
+    - jenkins2.add.github.org
