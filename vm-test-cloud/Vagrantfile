@@ -27,5 +27,8 @@ Vagrant.configure(2) do |config|
 
   config.vm.define "buildserver" do | appserver |
       appserver.vm.provision "shell", path: "vm-awsnode-setup.sh"
+      config.vm.provider :virtualbox do |vb|
+          vb.customize ["modifyvm", :id, "--memory", "1024"]
+      end
   end
 end
