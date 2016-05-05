@@ -1,0 +1,3 @@
+---
+dependencies: # always runs first! (then jenkins2 will run)
+   - role: karlmdavis.jenkins2
