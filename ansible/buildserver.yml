@@ -12,4 +12,8 @@
     - angstwad.docker_ubuntu
     - george.shuklin.flyway
     - jenkins2
-    - jenkins2.add.github.org
+    - role: jenkins2.add.github.org
+      repo_owner: toefel18
+      owner_name: Christophe Hesters
+      avatar: https://avatars.githubusercontent.com/u/11518461?v=3
+

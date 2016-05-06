@@ -1,4 +1,11 @@
 ---
+- name: create path to github organization
+  file:
+    path: /var/lib/jenkins/jobs/{{ repo_owner }}
+    state: directory
+    owner: jenkins
+    group: jenkins
+    mode: 0755
 - name: installing github organization of {{ repo_owner }}
   template:
     src: jenkins/jobs/github_organization_config/config.xml   # the file with jinja2 template directives
@@ -7,6 +14,20 @@
     group: jenkins                                            # file group
     mode: 0644                                                # rw-r--r--   (first digit is for special permissions, setuid, setgid, sticky)
     force: no
-    create: yes
 - name: restart jenkins
   service: name=jenkins state=restarted
+- name: Wait for Jenkins to come back up
+  uri:
+    url: "http://localhost:8080/login"
+    status_code: 200
+  register: jenkins_login_page
+  until: jenkins_login_page.status == 200
+  retries: 60
+  delay: 1
+- name: scan github owner account for projects and build them
+  # since this already executes on the host 'buildserver' we can just do a post call to localhost
+  uri:
+    method: POST
+    url: http://localhost:8080/job/{{ repo_owner }}/build?delay=0
+    HEADER_Content-Type: "application/x-www-form-urlencoded"
+    status_code: 302
