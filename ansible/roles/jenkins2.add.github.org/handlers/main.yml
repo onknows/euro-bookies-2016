@@ -1,0 +1,14 @@
+---
+# this is copied from the role of karlmdavis.jenkins2
+- name: Restart Service 'jenkins'
+  # This 'include' hack allows a single handler to run multiple tasks.
+  # Reference: https://github.com/ansible/ansible/issues/14270
+  include: ../handlers/restart-service.yml
+
+- name: Trigger build
+  uri:
+    method: POST
+    # since this already executes on the host 'buildserver' we can just do a post call to localhost
+    url: http://localhost:8080/job/{{ repo_owner }}/build?delay=0
+    HEADER_Content-Type: "application/x-www-form-urlencoded"
+    status_code: 302

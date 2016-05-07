@@ -1,0 +1,13 @@
+---
+- name: restart jenkins so that it pick's up the new configuration (TODO maybe change this to reload, then no restart required)
+  service:
+    name: jenkins
+    state: restarted
+- name: Wait for Jenkins to come back up
+  uri:
+    url: "http://localhost:8080/login"
+    status_code: 200
+  register: jenkins_login_page
+  until: jenkins_login_page.status == 200
+  retries: 60
+  delay: 1
