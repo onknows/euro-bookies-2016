@@ -7,6 +7,6 @@ node {
         sh 'npm test'
 
         stage 'Build docker image'
-        echo 'issue docker build command'
+        sh 'docker build -t bookies-2016-app:latest .'
     }
 }
