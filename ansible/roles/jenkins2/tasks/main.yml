@@ -8,3 +8,8 @@
 #    create: yes
 #    regexp: .*
 #    line: "{{ jenkins_admin_password }}"
+- name: add the jenkins user to the docker group, so that it can build images
+  user:
+    name: jenkins
+    groups: docker
+    append: yes
