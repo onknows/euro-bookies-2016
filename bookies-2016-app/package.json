@@ -6,6 +6,7 @@
   "author": "Christophe Hesters",
   "license": "Apache-2.0",
   "dependencies": {
+    "body-parser": "^1.15.1",
     "express": "^4.13.4",
     "mysql": "^2.10.2"
   },

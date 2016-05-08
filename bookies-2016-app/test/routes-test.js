@@ -17,6 +17,7 @@ var chai = require('chai');
 var expect = chai.expect;
 var request = require('supertest');
 
+var bodyParser = require('body-parser')
 var express = require('express');
 var Dao = require('../app/dao');
 var routes = require('../app/routes');
@@ -57,7 +58,7 @@ describe('GET /api/teams/:id', function () {
     var dao = new Dao('bogus', 'bogus', 'bogus', 'bogus');
 
     beforeEach(function () {
-        sinon.stub(dao, 'getTeamById', function (id, callback) {
+        sinon.stub(dao, 'getTeamByCountryCode', function (id, callback) {
             // use setTimeout to simulate async behavior
             setTimeout(function () {
                 if (id == 10) {
@@ -70,7 +71,7 @@ describe('GET /api/teams/:id', function () {
     });
 
     afterEach(function () {
-        dao.getTeamById.restore();
+        dao.getTeamByCountryCode.restore();
     });
 
     it('team with id 3 should return a team with id 3', function (done) {
@@ -110,6 +111,56 @@ describe('GET /api/teams/:id', function () {
             .set('Accept', 'application/json')
             .expect('Content-Type', 'text/html; charset=utf-8')
             .expect(404)
+            .end(function (err, res) { if (err) throw err; done(); });
+    });
+
+});
+
+
+describe('POST /api/teams/:id', function () {
+    var dao = new Dao('bogus', 'bogus', 'bogus', 'bogus');
+
+    beforeEach(function () {
+        sinon.stub(dao, 'addTeam', function (countryCode, teamName, callback) {
+            // use setTimeout to simulate async behavior
+            setTimeout(function () {
+                if (countryCode == 'ER') {
+                    callback(undefined);
+                } else {
+                    callback(countryCode.toUpperCase());
+                }
+            }, 0);
+        });
+    });
+
+    afterEach(function () {
+        dao.addTeam.restore();
+    });
+
+    it('created team AA', function (done) {
+        var app = express();
+        app.use(bodyParser.json()); // parses bodies with Content-Type application/json
+        routes.registerRoutes(app, dao);
+        request(app)
+            .post('/api/teams/AA')
+            .set('Content-Type', 'application/json')
+            .send({teamName: 'Alcoholic Anonymous'})
+            .expect(201)
+            .expect(function(res){
+                expect(res.body).to.be.json;
+                expect(JSON.stringify(res.body)).to.contain('AA');
+             })
+            .end(function (err, res) { if (err) throw err; done(); });
+    });
+
+    it('errors on duplicate team', function (done) {
+        var app = express();
+        app.use(bodyParser.json()); // parses bodies with Content-Type application/json
+        routes.registerRoutes(app, dao);
+        request(app)
+            .post('/api/teams/ER')
+            .send({teamName: 'Er Ror'})
+            .expect(409)
             .end(function (err, res) { if (err) throw err; done(); });
     });
 

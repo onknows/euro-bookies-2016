@@ -12,6 +12,7 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
+
 /**
  * Configures the REST endpoints on app. The dao is necessary to retrieve content.
  *
@@ -32,11 +33,22 @@ exports.registerRoutes = function(app, dao) {
 
     app.get('/api/teams/:id', function (req, res) {
         console.log("GET /api/teams/" + req.params.id);
-        dao.getTeamById(req.params.id, function (jsonResult) {
+        dao.getTeamByCountryCode(req.params.id, function (jsonResult) {
             if (jsonResult) {
                 res.json(jsonResult);
             } else {
                 res.status(404).send("Team with id " + req.params.id + " not found");
+            }
+        });
+    });
+
+    app.post('/api/teams/:id', function (req, res) {
+        console.log("POST /api/teams/" + req.params.id);
+        dao.addTeam(req.params.id.toUpperCase(), req.body.teamName, function (teamId) {
+            if (teamId) {
+                res.status(201).send({ team : teamId });
+            } else {
+                res.status(409).send("Failed to create team");
             }
         });
     });
