@@ -13,13 +13,17 @@
 //    limitations under the License.
 
 var express = require('express');
+var bodyParser = require('body-parser');
 var routes = require('./app/routes');
 var Dao = require('./app/dao');
 
 var dao = new Dao('127.0.0.1', 'root', 'root', 'bookies_db');
 var app = express();
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json()); // parses bodies with Content-Type application/json
+
 routes.registerRoutes(app, dao);
 app.use(express.static(__dirname + '/static'));
 
-var port = process.argv[2] ? process.argv[2] : 8088;
+var port = process.argv[2] ? process.argv[2] : 8080;
 app.listen(port, console.log('Server started at ' + port + '!'));

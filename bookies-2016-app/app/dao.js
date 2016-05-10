@@ -47,13 +47,13 @@ Dao.prototype.newConnection = function newConnection() {
  */
 Dao.prototype.getAllTeams = function(callback) {
     var connection = this.newConnection();
-    connection.query('SELECT id, countryCode FROM teams', function(err, rows, fields) {
+    connection.query('SELECT countryCode FROM teams', function(err, rows, fields) {
         if (err) {
             console.log('error in getAllTeams: ' + err.message);
             throw err;
         }
-        connection.end();
         callback(rows);
+        connection.end();
     });
 };
 
@@ -62,17 +62,31 @@ Dao.prototype.getAllTeams = function(callback) {
  * @param id
  * @param callback
  */
-Dao.prototype.getTeamById = function(id, callback) {
+Dao.prototype.getTeamByCountryCode = function(id, callback) {
     var connection = this.newConnection();
-    connection.query('SELECT * FROM teams WHERE id = ?', [id], function(err, rows, fields) {
+    connection.query('SELECT * FROM teams WHERE countryCode = ?', [id], function(err, rows, fields) {
         if (err) {
-            console.log('error in getTeamById: ' + err.message);
-            throw err;
-        }
-        if (rows.length == 0) {
+            console.log('error in getTeamByCountryCode: ' + err.message);
+            callback(null)
+        } else if (rows.length == 0) {
             callback(null);
         } else {
             callback(rows[0]);
+        }
+        connection.end();
+    });
+};
+
+Dao.prototype.addTeam = function(countryCode, teamName, callback) {
+    var connection = this.newConnection();
+    var dataToInsert = { countryCode: countryCode, teamName: teamName };
+    connection.query('INSERT INTO teams SET ?', dataToInsert, function(err, result) {
+        if (err && err.code == 'ER_DUP_ENTRY') {
+            callback(null);
+        } else if (err) {
+            console.log('error in addTeam: ' + err.message);
+        } else {
+            callback(countryCode);
         }
         connection.end();
     });
