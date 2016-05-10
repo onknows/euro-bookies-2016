@@ -92,4 +92,17 @@ Dao.prototype.addTeam = function(countryCode, teamName, callback) {
     });
 };
 
+Dao.prototype.removeTeam = function(countryCode, callback) {
+    var connection = this.newConnection();
+    connection.query('DELETE FROM teams WHERE countryCode = ?', [countryCode], function(err, result) {
+        if (err) {
+            console.log('error in removeTeam: ' + err.message);
+            callback(null);
+        } else {
+            callback(countryCode);
+        }
+        connection.end();
+    });
+};
+
 module.exports = Dao;

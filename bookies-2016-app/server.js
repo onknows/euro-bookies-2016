@@ -25,5 +25,5 @@ app.use(bodyParser.json()); // parses bodies with Content-Type application/json
 routes.registerRoutes(app, dao);
 app.use(express.static(__dirname + '/static'));
 
-var port = process.argv[2] ? process.argv[2] : 8080;
+var port = process.argv[2] ? process.argv[2] : 8088;
 app.listen(port, console.log('Server started at ' + port + '!'));

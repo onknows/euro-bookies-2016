@@ -53,6 +53,17 @@ exports.registerRoutes = function(app, dao) {
         });
     });
 
+    app.delete('/api/teams/:id', function (req, res) {
+        console.log("DELETE /api/teams/" + req.params.id);
+        dao.removeTeam(req.params.id.toUpperCase(), function (teamId) {
+            if (teamId) {
+                res.status(204).send({ team : teamId });
+            } else {
+                res.status(409).send("Failed to delete team");
+            }
+        });
+    });
+
     app.get('/api/users', function (req, res) {
         res.send('BettingUsers');
     });
