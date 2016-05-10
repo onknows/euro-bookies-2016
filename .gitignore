@@ -1,3 +1,5 @@
 .idea/
 bookies-2016-app/node_modules/
 bookies-2016-app/.project
+target/
+bookies-2016-app-acceptance-test.iml
