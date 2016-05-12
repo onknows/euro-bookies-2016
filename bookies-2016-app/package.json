@@ -8,14 +8,14 @@
   "dependencies": {
     "body-parser": "^1.15.1",
     "express": "^4.13.4",
+    "supervisor": "^0.9.1",
     "mysql": "^2.10.2"
   },
   "devDependencies": {
     "mocha": "*",
     "chai": "*",
     "sinon": "^1.17.3",
-    "supertest": "^1.2.0",
-    "supervisor": "^0.9.1"
+    "supertest": "^1.2.0"
   },
   "scripts": {
     "watch-start": "node_modules/.bin/supervisor server",
