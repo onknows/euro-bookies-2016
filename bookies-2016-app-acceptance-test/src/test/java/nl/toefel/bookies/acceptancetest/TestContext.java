@@ -34,7 +34,7 @@ public class TestContext {
         return baseUrl;
     }
 
-    public void assertWorkingConnection() throws HttpClientException {
+    public void assertThatConnectionIsWorking() throws HttpClientException {
         assertThat(request(context.baseUrl()).get().getStatusCode()).isEqualTo(200);
     }
 }

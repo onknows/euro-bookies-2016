@@ -1,7 +1,6 @@
 package nl.toefel.bookies.acceptancetest;
 
 import com.google.gson.reflect.TypeToken;
-import cucumber.api.PendingException;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -27,7 +26,7 @@ public class TeamsStepDefinitions {
 
     @Given("^a working connection to the bookies-app$")
     public void aWorkingConnectionToTheBookiesApp() throws Throwable {
-        context.assertWorkingConnection();
+        context.assertThatConnectionIsWorking();
     }
 
     @When("^i request all the teams$")
