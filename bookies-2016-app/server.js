@@ -17,7 +17,7 @@ var bodyParser = require('body-parser');
 var routes = require('./app/routes');
 var Dao = require('./app/dao');
 
-var dao = new Dao('127.0.0.1', 'root', 'root', 'bookies_db');
+var dao = new Dao('192.168.178.12', 'root', 'root', 'bookies_db');
 var app = express();
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json()); // parses bodies with Content-Type application/json

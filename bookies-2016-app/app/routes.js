@@ -33,35 +33,49 @@ exports.registerRoutes = function(app, dao) {
 
     app.get('/api/teams/:id', function (req, res) {
         console.log("GET /api/teams/" + req.params.id);
-        dao.getTeamByCountryCode(req.params.id, function (jsonResult) {
-            if (jsonResult) {
-                res.json(jsonResult);
-            } else {
-                res.status(404).send("Team with id " + req.params.id + " not found");
-            }
-        });
+        if (req.params.id.length != 2) {
+            res.status(400).send("Country code should always have length 2");
+        } else {
+            dao.getTeamByCountryCode(req.params.id, function (jsonResult) {
+                if (jsonResult) {
+                    res.json(jsonResult);
+                } else {
+                    res.status(404).send("Team with id " + req.params.id + " not found");
+                }
+            });
+        }
     });
 
     app.post('/api/teams/:id', function (req, res) {
         console.log("POST /api/teams/" + req.params.id);
-        dao.addTeam(req.params.id.toUpperCase(), req.body.teamName, function (teamId) {
-            if (teamId) {
-                res.status(201).send({ team : teamId });
-            } else {
-                res.status(409).send("Failed to create team");
-            }
-        });
+        if (req.params.id.length != 2) {
+            res.status(400).send("Country code should always have length 2");
+        } else {
+            dao.addTeam(req.params.id.toUpperCase(), req.body.teamName, function (teamId) {
+                if (teamId == -1) {
+                    res.status(500).send("Error while creating the team");
+                } else if (teamId) {
+                    res.status(201).send({ team : teamId });
+                } else {
+                    res.status(409).send("Failed to create team, already exists");
+                }
+            });
+        }
     });
 
     app.delete('/api/teams/:id', function (req, res) {
         console.log("DELETE /api/teams/" + req.params.id);
-        dao.removeTeam(req.params.id.toUpperCase(), function (teamId) {
-            if (teamId) {
-                res.status(204).send({ team : teamId });
-            } else {
-                res.status(409).send("Failed to delete team");
-            }
-        });
+        if (req.params.id.length != 2) {
+                    res.status(400).send("Country code should always have length 2");
+        } else {
+            dao.removeTeam(req.params.id.toUpperCase(), function (teamId) {
+                if (teamId) {
+                    res.status(204).send({ team : teamId });
+                } else {
+                    res.status(409).send("Failed to delete team");
+                }
+            });
+        }
     });
 
     app.get('/api/users', function (req, res) {

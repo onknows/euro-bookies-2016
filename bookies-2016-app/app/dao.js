@@ -84,6 +84,7 @@ Dao.prototype.addTeam = function(countryCode, teamName, callback) {
         if (err && err.code == 'ER_DUP_ENTRY') {
             callback(null);
         } else if (err) {
+            callback(-1);
             console.log('error in addTeam: ' + err.message);
         } else {
             callback(countryCode);
