@@ -1,6 +1,6 @@
 # not an official repo, but seems legit
 # depending on alpine-linux based layers vs makes the image 30MB instead of 660MB
-FROM mhart/alpine-node:4
+FROM mhart/alpine-node:6
 
 MAINTAINER Christophe Hesters <toefel18@gmail.com>
 
