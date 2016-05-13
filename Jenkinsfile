@@ -1,5 +1,5 @@
 #!groovy
-node {
+pipeline('linux') {
     checkout scm
     dir('bookies-2016-app') {
         stage 'compile & test'
@@ -46,6 +46,17 @@ node {
     }
 }
 
-// send slack on failure: http://stackoverflow.com/questions/36837683/how-to-perform-actions-for-failed-builds-in-jenkinsfile
-// https://hooks.slack.com/services/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
-// curl -X POST --data-urlencode 'payload={"channel": "#builds", "username": "Jenkins-Pipeline", "text": "This is posted to #builds and comes from a bot named webhookbot.", "icon_emoji": ":ghost:"}' https://hooks.slack.com/services/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
+/** Wrapper around the body of a node, so that we can send slack notifications, to unwrap, just remove this method replace pipeline with node */
+def pipeline(String label, Closure body) {
+    node(label) {
+        wrap([$class: 'TimestamperBuildWrapper']) {
+            try {
+                body.call()
+            } catch (Exception e) {
+                // send slack on failure: http://stackoverflow.com/questions/36837683/how-to-perform-actions-for-failed-builds-in-jenkinsfile
+                sh 'curl -X POST --data-urlencode \'payload={"channel": "#builds", "username": "Jenkins-Pipeline", "text": "bookies pipeline failed: " ' + e.getMessage() + ', "icon_emoji": ":x:"}\' https://hooks.slack.com/services/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'
+                throw e; // rethrow so the build is considered failed
+            }
+        }
+    }
+}
