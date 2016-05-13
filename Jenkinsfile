@@ -1,5 +1,5 @@
 #!groovy
-pipeline('linux') {
+pipeline('') {
     checkout scm
     dir('bookies-2016-app') {
         stage 'compile & test'
