@@ -28,4 +28,5 @@ EXPOSE 8080
 
 # using exec makes supervisor the root process, this causes it to receive SIGTERM when docker stop is called and quit correctly
 # supervisor restarts the script when it crashes, this is more robust than starting with `node server.js ...`
-CMD exec node_modules/.bin/supervisor -- server.js 8080 "$software_version" "$image_build_timestamp"
+# WARNING: do not use localhost (only sees other processes within the container) use the IP of the host machine!
+CMD exec node_modules/.bin/supervisor -- server.js 8080 "${connectionString:-missing_connection_string}" "$software_version" "$image_build_timestamp"
