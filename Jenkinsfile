@@ -28,7 +28,7 @@ node {
         // start the application and connect it to our test database
         // we cannot use localhost as the IP, that would not be able to go outside the container
         // to get the ip address we use $(ip route get 8.8.8.8 | head -1 | cut -d' ' -f8)
-        sh 'docker run -d --name=cucumber_bookies_app -p 7778:8080 -e DB_CONNECTION_STRING=mysql://cucumber:cucumber@$(ip route get 8.8.8.8 | head -1 | cut -d\' \' -f8)/bookies_db toefel/bookies-2016-app:$(git rev-parse --short HEAD)'
+        sh 'docker run -d --name=cucumber_bookies_app -p 7778:8080 -e DB_CONNECTION_STRING=mysql://cucumber:cucumber@$(ip route get 8.8.8.8 | head -1 | cut -d\' \' -f8):7777/bookies_db toefel/bookies-2016-app:$(git rev-parse --short HEAD)'
         try {
             dir('bookies-2016-app-acceptance-test') {
                 // run a maven build
