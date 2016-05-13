@@ -29,7 +29,7 @@ describe('GET /api/teams', function () {
         sinon.stub(dao, 'getAllTeams', function (callback) {
             // use setTimeout to simulate async behavior
             setTimeout(function () {
-                callback('[{id: 1, teamName: "Oranje"}, {id: 2, teamName: "Ukraine"}]');
+                callback('[{countryCode: NL, teamName: "Oranje"}, {countryCode: UA, teamName: "Ukraine"}]');
             }, 0);
         });
     });
@@ -54,17 +54,17 @@ describe('GET /api/teams', function () {
     });
 });
 
-describe('GET /api/teams/:id', function () {
+describe('GET /api/teams/:countryCode', function () {
     var dao = new Dao('bogus', 'bogus', 'bogus', 'bogus');
 
     beforeEach(function () {
-        sinon.stub(dao, 'getTeamByCountryCode', function (id, callback) {
+        sinon.stub(dao, 'getTeamByCountryCode', function (countryCode, callback) {
             // use setTimeout to simulate async behavior
             setTimeout(function () {
-                if (id == 10) {
+                if (countryCode == 'ZZ') {
                     callback(undefined);
                 } else {
-                    callback('{id: ' + id + ', teamName: "the team"}');
+                    callback('{countryCode: "' + countryCode + '", teamName: "the team"}');
                 }
             }, 0);
         });
@@ -74,40 +74,40 @@ describe('GET /api/teams/:id', function () {
         dao.getTeamByCountryCode.restore();
     });
 
-    it('team with id 3 should return a team with id 3', function (done) {
+    it('team with countryCode NL should return a team with countryCode NL', function (done) {
         var app = express();
         routes.registerRoutes(app, dao);
         request(app)
-            .get('/api/teams/3')
+            .get('/api/teams/NL')
             .set('Accept', 'application/json')
             .expect('Content-Type', 'application/json; charset=utf-8')
             .expect(200)
             .expect(function(res){
-                expect(res.body).to.contain("id: 3");
+                expect(res.body).to.contain("countryCode: \"NL\"");
              })
             .end(function (err, res) { if (err) throw err; done(); });
     });
 
-    it('team with id 5 should return a team with id 5', function (done) {
+    it('team with countryCode UA should return a team with countryCode UA', function (done) {
         var app = express();
         routes.registerRoutes(app, dao);
         request(app)
-            .get('/api/teams/5')
+            .get('/api/teams/UA')
             .set('Accept', 'application/json')
             .expect('Content-Type', 'application/json; charset=utf-8')
             .expect(200)
             .expect(function(res){
-                expect(res.body).to.contain("id: 5");
+                expect(res.body).to.contain("countryCode: \"UA\"");
             })
             .end(function (err, res) { if (err) throw err; done(); });
     });
 
 
-    it('team with id 10 that does not exist should return 404', function (done) {
+    it('team with countryCode ZZ that does not exist should return 404', function (done) {
         var app = express();
         routes.registerRoutes(app, dao);
         request(app)
-            .get('/api/teams/10')
+            .get('/api/teams/ZZ')
             .set('Accept', 'application/json')
             .expect('Content-Type', 'text/html; charset=utf-8')
             .expect(404)
@@ -117,7 +117,7 @@ describe('GET /api/teams/:id', function () {
 });
 
 
-describe('POST /api/teams/:id', function () {
+describe('POST /api/teams/:countryCode', function () {
     var dao = new Dao('bogus', 'bogus', 'bogus', 'bogus');
 
     beforeEach(function () {
