@@ -15,7 +15,7 @@ node {
     stage 'acceptance test'
     // start a clean database using the mariadb docker image (The database is configured by providing environment variables using -e,)
     // we use the name as an easy reference to stop it later
-    sh 'docker run -p 7777:3306 -d -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=bookies_db -e MYSQL_USER=cucumber -e MYSQL_PASSWORD=cucumber --name=cucumber_bookies_db mariadb'
+    sh 'docker run -d --name=cucumber_bookies_db -p 7777:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=bookies_db -e MYSQL_USER=cucumber -e MYSQL_PASSWORD=cucumber mariadb'
     try {
         // wait till the database is initialized booted (this should be replaced by a polling loop to reduce wait time)
         sleep 20
@@ -26,12 +26,18 @@ node {
         }
 
         // start the application and connect it to our test database
-        sh 'docker run -d -p 7778:8080 --name=cucumber_bookies_app toefel/bookies-2016-app:$(git rev-parse --short HEAD)'
+        // we cannot use localhost as the IP, that would not be able to go outside the container
+        // to get the ip address we use $(ip route get 8.8.8.8 | head -1 | cut -d' ' -f8)
+        sh 'docker run -d --name=cucumber_bookies_app -p 7778:8080 -e DB_CONNECTION_STRING=mysql://cucumber:cucumber@$(ip route get 8.8.8.8 | head -1 | cut -d\' \' -f8)/bookies_db toefel/bookies-2016-app:$(git rev-parse --short HEAD)'
         try {
             dir('bookies-2016-app-acceptance-test') {
-                sh 'mvn clean install'
+                // run a maven build
+                sh 'mvn clean install -Dapplication.url=http://localhost:7778'
+                // if the build was successful, send a slack notification
+                sh 'curl -X POST --data-urlencode \'payload={"channel": "#builds", "username": "Jenkins-Pipeline", "text": "Bookies acceptance test succeeded", "icon_emoji": ":ghost:"}\' https://hooks.slack.com/services/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'
             }
         } finally {
+            // remove the application container, to avoid building up a lot of waste
             sh 'docker rm -f cucumber_bookies_app'
         }
     } finally {
@@ -39,3 +45,7 @@ node {
         sh 'docker rm -f cucumber_bookies_db'
     }
 }
+
+// send slack on failure: http://stackoverflow.com/questions/36837683/how-to-perform-actions-for-failed-builds-in-jenkinsfile
+// https://hooks.slack.com/services/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
+// curl -X POST --data-urlencode 'payload={"channel": "#builds", "username": "Jenkins-Pipeline", "text": "This is posted to #builds and comes from a bot named webhookbot.", "icon_emoji": ":ghost:"}' https://hooks.slack.com/services/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
