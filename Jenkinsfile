@@ -54,7 +54,7 @@ def pipeline(String label, Closure body) {
                 body.call()
             } catch (Exception e) {
                 // send slack on failure: http://stackoverflow.com/questions/36837683/how-to-perform-actions-for-failed-builds-in-jenkinsfile
-                sh 'curl -X POST --data-urlencode \'payload={"channel": "#builds", "username": "Jenkins-Pipeline", "text": "bookies pipeline failed: " ' + e.getMessage() + ', "icon_emoji": ":x:"}\' https://hooks.slack.com/services/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'
+                sh 'curl -X POST --data-urlencode \'payload={"channel": "#builds", "username": "Jenkins-Pipeline", "text": "bookies pipeline failed: " ' + e.toString() + ', "icon_emoji": ":x:"}\' https://hooks.slack.com/services/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'
                 throw e; // rethrow so the build is considered failed
             }
         }
