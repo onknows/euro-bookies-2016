@@ -1,4 +1,6 @@
 #!groovy
+import junit.framework.TestFailure
+
 pipeline('') {
     checkout scm
     dir('bookies-2016-app') {
@@ -31,9 +33,9 @@ pipeline('') {
         sh 'docker run -d --name=cucumber_bookies_app -p 7778:8080 -e DB_CONNECTION_STRING=mysql://cucumber:cucumber@$(ip route get 8.8.8.8 | head -1 | cut -d\' \' -f8):7777/bookies_db toefel/bookies-2016-app:$(git rev-parse --short HEAD)'
         try {
             dir('bookies-2016-app-acceptance-test') {
-                // run a maven build
+                // run a maven build that automatically executes cucumber acceptance tests
                 sh 'mvn clean install -Dapplication.url=http://localhost:7778'
-                // if the build was successful, send a slack notification
+                // if the build was successful, send a slack notification, otherwise an exception is thrown and catched by the wrapper below
                 sh 'curl -X POST --data-urlencode \'payload={"channel": "#builds", "username": "Jenkins-Pipeline", "text": "Bookies acceptance test succeeded", "icon_emoji": ":white_check_mark:"}\' https://hooks.slack.com/services/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'
             }
         } finally {
@@ -54,7 +56,7 @@ def pipeline(String label, Closure body) {
                 body.call()
             } catch (Exception e) {
                 // send slack on failure: http://stackoverflow.com/questions/36837683/how-to-perform-actions-for-failed-builds-in-jenkinsfile
-                sh 'curl -X POST --data-urlencode \'payload={"channel": "#builds", "username": "Jenkins-Pipeline", "text": "bookies pipeline failed: " ' + e.getMessage() + ', "icon_emoji": ":x:"}\' https://hooks.slack.com/services/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'
+                sh 'curl -X POST --data-urlencode \'payload={"channel": "#builds", "username": "Jenkins-Pipeline", "text": "bookies pipeline failed! See logging for more information", "icon_emoji": ":x:"}\' https://hooks.slack.com/services/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'
                 throw e; // rethrow so the build is considered failed
             }
         }
