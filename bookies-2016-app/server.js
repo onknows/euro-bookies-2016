@@ -17,12 +17,21 @@ var bodyParser = require('body-parser');
 var routes = require('./app/routes');
 var Dao = require('./app/dao');
 
-var dao = new Dao('192.168.178.12', 'root', 'root', 'bookies_db');
+var port = process.argv[2] ? process.argv[2] : 8088;
+var dbUrl = process.argv[3] ? process.argv[3] : 'mysql://root:root@localhost/bookies_db';
+
+// Create a database access object
+var dao = new Dao(dbUrl);
+
+// Create an instance of express (REST framework) and enable JSON content parsing.
 var app = express();
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json()); // parses bodies with Content-Type application/json
 
+// Configure REST endpoints
 routes.registerRoutes(app, dao);
+
+// Serve a directory with static files
 app.use(express.static(__dirname + '/static'));
 
 var port = process.argv[2] ? process.argv[2] : 8088;

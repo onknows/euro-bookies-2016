@@ -29,15 +29,30 @@ var Dao = function(host, user, password, database) {
 };
 
 /**
+ * @param host database server hostname
+ * @param user
+ * @param password
+ * @param database
+ * @constructor
+ */
+var Dao = function(connectionUrl) {
+    this.connectionUrl = connectionUrl
+};
+
+/**
  * Creates a new database connection
  */
 Dao.prototype.newConnection = function newConnection() {
-    return mysql.createConnection({
-        host: this.host,
-        user: this.user,
-        password: this.password,
-        database: this.database
-    });
+    if (this.connectionUrl) {
+        return mysql.createConnection(this.connectionUrl);
+    } else {
+        return mysql.createConnection({
+            host: this.host,
+            user: this.user,
+            password: this.password,
+            database: this.database
+        });
+    }
 };
 
 /**

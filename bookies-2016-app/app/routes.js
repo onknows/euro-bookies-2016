@@ -21,7 +21,16 @@
  */
 exports.registerRoutes = function(app, dao) {
     app.get('/', function (req, res) {
+        console.log("GET /");
         res.send('Welcome to euro-bookies :) !');
+    });
+
+    app.get('/version', function(req, res) {
+        console.log("GET /version");
+        var gitShorthash = process.argv[4] ? process.argv[4] : '0000000';
+        var buildTimestamp = process.argv[5] ? process.argv[5] : '2016-00-00T00:00:00Z';
+        var version = { version: gitShorthash, dockerBuildTimestamp: buildTimestamp }
+        res.json(version);
     });
 
     app.get('/api/teams', function (req, res) {
@@ -76,13 +85,5 @@ exports.registerRoutes = function(app, dao) {
                 }
             });
         }
-    });
-
-    app.get('/api/users', function (req, res) {
-        res.send('BettingUsers');
-    });
-
-    app.get('/api/users/:id', function (req, res) {
-        res.send('BettingUser ' + req.params.id);
     });
 };
