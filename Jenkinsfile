@@ -10,7 +10,7 @@ pipeline('') {
 
 
         stage 'Build docker image'
-        sh 'docker build --build-arg software_version=$(git rev-parse --short HEAD) --build-arg image_build_timestamp=$(date -u +%Y-%m-%dT%H:%M:%S%Z) -t toefel/bookies-2016-app:$(git rev-parse --short HEAD) .'
+        sh 'docker build --build-arg software_version=$(git rev-parse --short HEAD) --build-arg image_build_timestamp=$(date -u +%Y-%m-%dT%H:%M:%S%Z) -t softwarecraftsmanshipcgi/bookies-2016-app:$(git rev-parse --short HEAD) .'
         // tag the image with latest as well?
     }
 
@@ -30,7 +30,7 @@ pipeline('') {
         // start the application and connect it to our test database
         // we cannot use localhost as the IP, that would not be able to go outside the container
         // to get the ip address we use $(ip route get 8.8.8.8 | head -1 | cut -d' ' -f8)
-        sh 'docker run -d --name=cucumber_bookies_app -p 7778:8080 -e DB_CONNECTION_STRING=mysql://cucumber:cucumber@$(ip route get 8.8.8.8 | head -1 | cut -d\' \' -f8):7777/bookies_db toefel/bookies-2016-app:$(git rev-parse --short HEAD)'
+        sh 'docker run -d --name=cucumber_bookies_app -p 7778:8080 -e DB_CONNECTION_STRING=mysql://cucumber:cucumber@$(ip route get 8.8.8.8 | head -1 | cut -d\' \' -f8):7777/bookies_db softwarecraftsmanshipcgi/bookies-2016-app:$(git rev-parse --short HEAD)'
         try {
             dir('bookies-2016-app-acceptance-test') {
                 // run a maven build that automatically executes cucumber acceptance tests
@@ -46,6 +46,10 @@ pipeline('') {
         // clean up test database container
         sh 'docker rm -f cucumber_bookies_db'
     }
+
+    stage 'Uploading verified image to docker hub'
+    sh 'docker login --username=softwarecraftsmanshipcgi --password Welkom01!'
+    sh 'docker push softwarecraftsmanshipcgi/bookies-2016-app:$(git rev-parse --short HEAD)'
 }
 
 /** Wrapper around the body of a node, so that we can send slack notifications, to unwrap, just remove this method replace pipeline with node */
