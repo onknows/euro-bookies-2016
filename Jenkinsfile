@@ -1,5 +1,4 @@
 #!groovy
-import junit.framework.TestFailure
 
 pipeline('') {
     checkout scm
