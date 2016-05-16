@@ -36,6 +36,7 @@ pipeline('') {
                 // run a maven build that automatically executes cucumber acceptance tests
                 sh 'mvn clean install -Dapplication.url=http://localhost:7778'
                 // if the build was successful, send a slack notification, otherwise an exception is thrown and catched by the wrapper below
+                sendSlack("Bookies acceptance test succeeded", MessageType.SUCCESS);
                 sh 'curl -X POST --data-urlencode \'payload={"channel": "#builds", "username": "Jenkins-Pipeline", "text": "Bookies acceptance test succeeded", "icon_emoji": ":white_check_mark:"}\' https://hooks.slack.com/services/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'
             }
         } finally {
@@ -48,21 +49,28 @@ pipeline('') {
     }
 
     stage 'Uploading verified image to docker hub'
-    sh 'docker login --username=softwarecraftsmanshipcgi --password Welkom01!'
+    sh 'docker login --username=softwarecraftsmanshipcgi --password Welkom01!' // don't store this password here!
     sh 'docker push softwarecraftsmanshipcgi/bookies-2016-app:$(git rev-parse --short HEAD)'
 }
 
-/** Wrapper around the body of a node, so that we can send slack notifications, to unwrap, just remove this method replace pipeline with node */
+/** Wrapper around the body of a node, so that we can send slack notifications on failures, to unwrap: remove this method replace 'pipeline' with 'node' */
 def pipeline(String label, Closure body) {
     node(label) {
         wrap([$class: 'TimestamperBuildWrapper']) {
             try {
                 body.call()
             } catch (Exception e) {
-                // send slack on failure: http://stackoverflow.com/questions/36837683/how-to-perform-actions-for-failed-builds-in-jenkinsfile
-                sh 'curl -X POST --data-urlencode \'payload={"channel": "#builds", "username": "Jenkins-Pipeline", "text": "bookies pipeline failed! See logging for more information", "icon_emoji": ":x:"}\' https://hooks.slack.com/services/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'
+                // normally we would include the stacktrace or the exception message, but this is blocked by script-security!
+                sendSlack("Failure in bookies pipeline, review logging for details", MessageType.FAILURE);
                 throw e; // rethrow so the build is considered failed
             }
         }
     }
+}
+
+enum MessageType { SUCCESS, FAILURE }
+def sendSlack(String message, MessageType messageType) {
+    // send slack: http://stackoverflow.com/questions/36837683/how-to-perform-actions-for-failed-builds-in-jenkinsfile
+    String emoji = messageType == MessageType.FAILURE ? ":x:" : ":white_check_mark:"
+    sh 'curl -X POST --data-urlencode \'payload={"channel": "#builds", "username": "Jenkins-Pipeline", "text": "' + message + '", "icon_emoji": "' + emoji + '"}\' https://hooks.slack.com/services/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'
 }
