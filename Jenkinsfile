@@ -18,9 +18,9 @@ pipeline('') {
     // we use the name as an easy reference to stop it later
     sh 'docker run -d --name=cucumber_bookies_db -p 7777:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=bookies_db -e MYSQL_USER=cucumber -e MYSQL_PASSWORD=cucumber mariadb'
     try {
-        // update the database to the latest version using flyway. The database might not be up yet, so try 3 times
-        retry(5) {
-            sleep 10
+        // update the database to the latest version using flyway. The database might not be up yet on slow nodes, so try 3 times
+        retry(3) {
+            sleep 20
             dir('bookies-2016-app-database') {
                 // update the database to the latest known version using flyway, the version scripts are located in subdirectory sql
                 sh 'flyway -user=root -password=root -url=jdbc:mysql://localhost:7777/bookies_db -locations=filesystem:sql migrate'
