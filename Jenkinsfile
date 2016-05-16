@@ -21,9 +21,9 @@ pipeline('') {
         // update the database to the latest version using flyway. The database might not be up yet, so try 3 times
         retry(5) {
             sleep 10
-            dir('bookies-2016-database') {
+            dir('bookies-2016-app-database') {
                 // update the database to the latest known version using flyway, the version scripts are located in subdirectory sql
-                sh 'flyway -user=cucumber -password=cucumber -url=jdbc:mysql://localhost:7777/bookies_db -locations=filesystem:sql migrate'
+                sh 'flyway -user=root -password=root -url=jdbc:mysql://localhost:7777/bookies_db -locations=filesystem:sql migrate'
             }
         }
 
