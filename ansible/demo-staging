@@ -1,0 +1,13 @@
+[docker]
+52.51.61.163  ansible_user=ubuntu
+
+[db]
+52.49.53.156  ansible_user=ubuntu
+
+[buildserver]
+52.51.57.231  ansible_user=ubuntu
+
+[all:children]
+docker
+db
+buildserver
