@@ -48,9 +48,22 @@ pipeline('') {
         sh 'docker rm -f cucumber_bookies_db'
     }
 
-    stage 'Uploading verified image to docker hub'
+    stage 'upload to docker hub'
     sh 'docker login --username=softwarecraftsmanshipcgi --password Welkom01!' // don't store this password here!
     sh 'docker push softwarecraftsmanshipcgi/bookies-2016-app:$(git rev-parse --short HEAD)'
+
+    // checkpoints allow you to continue from this point in the pipeline, useful if you would like to re-deploy
+    checkpoint ('before deploy staging')
+    stage 'deploy staging'
+    echo 'WORK IN PROGRESS'
+ //   sh 'ansible-playbook -i <inventory-from-platform> -e "@bookies-2016-app-deployment/bookies-deployment-variables.yml" -e "image_version=$(git rev-parse --short HEAD)" bookies-2016-app-deployment/deploy-application.yml'
+
+    stage 'load test against staging'
+    echo 'WORK IN PROGRESS'
+    // checkpoints allow you to continue from this point in the pipeline, useful if you would like to re-deploy
+    checkpoint ('before deploy production')
+    stage 'deploy production'
+    echo 'WORK IN PROGRESS'
 }
 
 /** Wrapper around the body of a node, so that we can send slack notifications on failures, to unwrap: remove this method replace 'pipeline' with 'node' */
