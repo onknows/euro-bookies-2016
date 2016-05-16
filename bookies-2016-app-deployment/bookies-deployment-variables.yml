@@ -1,0 +1,16 @@
+---
+# deployment properties for the bookies application, pass this file to the deployment script and possibly override vars as follows:
+# ansible-playbook -i inventory -e "@bookies-deployment-variables" -e "image_version=72f9012 flyway_migration_location=../some/path" deploy-application.yml
+docker_repo: softwarecraftsmanshipcgi
+image_name: bookies-2016-app
+image_version: latest                 # set it to the shorthash of the image version you want to deploy, we don't create the latest tag but it's a sensible default
+
+container_name: bookies_2016_app
+public_application_port: 80
+port_in_container: 8080
+
+db_user: bookies
+db_password: bookies
+db_port: 3306
+db_name: bookies_db
+flyway_migration_location: ../bookies-2016-app-database/sql

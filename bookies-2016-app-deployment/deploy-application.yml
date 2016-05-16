@@ -1,0 +1,29 @@
+---
+# Stop the currently running application
+- hosts: docker
+  become: yes
+  tasks:
+    - name: Stopping the application
+      docker:
+          name: "{{ container_name }}"
+          image: "{{ docker_repo }}/{{ image_name }}"
+          state: absent                    # the container is removed, otherwise starting with the same name fails later on.
+
+# Bring the database up to the newest version
+- hosts: buildserver                       # flyway is located on the build-server, the buildserver connects to the db machines
+  tasks:
+    - name: "Updating the database"
+      command: flyway -user={{ db_user }} -password={{ db_password }} -url="jdbc:mysql://{{ item }}:{{ db_port }}/{{ db_name }}" -locations=filesystem:{{ flyway_migration_location }} migrate
+      with_inventory_hostnames: database   # loop this task over all databases
+
+# Start the newest version of the container
+- hosts: docker
+  become: yes
+  tasks:
+    - name: Stopping the application
+      docker:
+          name: "{{ container_name }}"
+          image: "{{ docker_repo }}/{{ image_name }}:{{ image_version }}"
+          ports: "{{ public_application_port }}:{{ port_in_container }}"
+          restart: on-failure
+          state: started                    # the container is removed, otherwise starting with the same name fails later on.
