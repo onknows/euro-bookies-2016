@@ -1,4 +1,4 @@
-# install docker role
+# install docker roles from ansible galaxy
 - src: angstwad.docker_ubuntu
 - src: tecris.maven
 - src: karlmdavis.jenkins2
