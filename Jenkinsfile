@@ -37,7 +37,7 @@ pipeline('') {
                 // run a maven build that automatically executes cucumber acceptance tests
                 sh 'mvn clean install -Dapplication.url=http://localhost:7778'
                 // if the build was successful, send a slack notification, otherwise an exception is thrown and catched by the wrapper below
-                sendSlack("Bookies acceptance test succeeded", false);
+                notifySuccess("Bookies acceptance test succeeded");
                 sh 'curl -X POST --data-urlencode \'payload={"channel": "#builds", "username": "Jenkins-Pipeline", "text": "Bookies acceptance test succeeded", "icon_emoji": ":white_check_mark:"}\' https://hooks.slack.com/services/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'
             }
         } finally {
@@ -79,15 +79,16 @@ def pipeline(String label, Closure body) {
                 body.call()
             } catch (Exception e) {
                 // normally we would include the stacktrace or the exception message, but this is blocked by script-security (must be whitelisted)!
-                sendSlack("Failure in bookies pipeline, review logging for details", true);
+                notifyFailure("Failure in bookies pipeline, review logging for details");
                 throw e; // rethrow so the build is considered failed
             }
         }
     }
 }
 
-def sendSlack(String message, boolean messageIndicatesFailure) {
-    // send slack: http://stackoverflow.com/questions/36837683/how-to-perform-actions-for-failed-builds-in-jenkinsfile
-    String emoji = messageIndicatesFailure == FAILURE ? ":x:" : ":white_check_mark:"
+def sendSlack(String message, String emoji) {
     sh 'curl -X POST --data-urlencode \'payload={"channel": "#builds", "username": "Jenkins-Pipeline", "text": "' + message + '", "icon_emoji": "' + emoji + '"}\' https://hooks.slack.com/services/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'
 }
+
+def notifyFailure(String message) { sendSlack(message, ":x:"); }
+def notifySuccess(String message) { sendSlack(message, ":white_check_mark:"); }
