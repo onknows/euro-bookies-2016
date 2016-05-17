@@ -53,17 +53,20 @@ pipeline('') {
     sh 'docker push softwarecraftsmanshipcgi/bookies-2016-app:$(git rev-parse --short HEAD)'
 
     // checkpoints allow you to continue from this point in the pipeline, useful if you would like to re-deploy
-//    checkpoint ('before deploy staging')
+//    checkpoint ('before deploy staging') // (only available in enterprise edition
     stage 'deploy staging'
-    echo 'WORK IN PROGRESS'
- //   sh 'ansible-playbook -i <inventory-from-platform> -e "@bookies-2016-app-deployment/bookies-deployment-variables.yml" -e "image_version=$(git rev-parse --short HEAD)" bookies-2016-app-deployment/deploy-application.yml'
+    sh 'ansible-playbook -i /home/ubuntu/euro-bookies-2016/ansible/demo_staging -e "@bookies-2016-app-deployment/bookies-deployment-variables.yml" -e "image_version=$(git rev-parse --short HEAD)" bookies-2016-app-deployment/deploy-application.yml'
 
     stage 'load test against staging'
-    echo 'WORK IN PROGRESS'
+    dir('bookies-2016-app-load-test') {
+        // run the gatling tests using maven
+        sh 'mvn clean install'
+    }
+
     // checkpoints allow you to continue from this point in the pipeline, useful if you would like to re-deploy
-//    checkpoint ('before deploy production')
+//    checkpoint ('before deploy production') // (only available in enterprise edition
     stage 'deploy production'
-    echo 'WORK IN PROGRESS'
+    sh 'ansible-playbook -i /home/ubuntu/euro-bookies-2016/ansible/demo_production -e "@bookies-2016-app-deployment/bookies-deployment-variables.yml" -e "image_version=$(git rev-parse --short HEAD)" bookies-2016-app-deployment/deploy-application.yml'
 }
 
 /**
