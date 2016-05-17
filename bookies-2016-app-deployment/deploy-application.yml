@@ -14,7 +14,7 @@
   tasks:
     - name: "Updating the database"
       command: flyway -user={{ db_user }} -password={{ db_password }} -url="jdbc:mysql://{{ item }}:{{ db_port }}" -schemas="{{ db_name }}" -locations=filesystem:{{ flyway_migration_location }} migrate
-      with_inventory_hostnames: database   # loop this task over all databases
+      with_inventory_hostnames: db   # loop this task over all databases
 
 # Start the newest version of the container
 - hosts: docker
@@ -25,5 +25,5 @@
           name: "{{ container_name }}"
           image: "{{ docker_repo }}/{{ image_name }}:{{ image_version }}"
           ports: "{{ public_application_port }}:{{ port_in_container }}"
-          restart: on-failure
+          restart_policy: on-failure
           state: started                    # the container is removed, otherwise starting with the same name fails later on.

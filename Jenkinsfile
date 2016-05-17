@@ -4,20 +4,23 @@ pipeline('') {
     checkout scm
 
     stage 'compile & test'
+
     dir('bookies-2016-app') {
         sh 'npm install'
         sh 'npm test'
     }
 
     stage 'Build docker image'
+
     dir('bookies-2016-app') {
         sh 'docker build --build-arg software_version=$(git rev-parse --short HEAD) --build-arg image_build_timestamp=$(date -u +%Y-%m-%dT%H:%M:%S%Z) -t softwarecraftsmanshipcgi/bookies-2016-app:$(git rev-parse --short HEAD) .'
         // it would be nice tag the image with latest as well for ease of use!
     }
 
     stage 'acceptance test'
-    // start a clean database using the mariadb docker image (The database is configured by providing environment variables using -e,)
-    // we use the name as an easy reference to stop it later
+
+    // start a clean database using the mariadb docker image (The database is configured by providing environment variables using -e)
+    // we use the name so we can reference to stop it later
     sh 'docker run -d --name=cucumber_bookies_db -p 7777:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=bookies_db -e MYSQL_USER=cucumber -e MYSQL_PASSWORD=cucumber mariadb'
     try {
         // update the database to the latest version using flyway. The database might not be up yet on slow nodes, so try 3 times
@@ -41,32 +44,35 @@ pipeline('') {
                 sh 'curl -X POST --data-urlencode \'payload={"channel": "#builds", "username": "Jenkins-Pipeline", "text": "Bookies acceptance test succeeded", "icon_emoji": ":white_check_mark:"}\' https://hooks.slack.com/services/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'
             }
         } finally {
-            sh 'docker rm -f cucumber_bookies_app'      // remove the application container, to avoid building up a lot of waste
+            sh 'docker rm -f cucumber_bookies_app'             // remove the application container, to avoid building up a lot of waste
         }
     } finally {
-        // clean up test database container
-        sh 'docker rm -f cucumber_bookies_db'
+        sh 'docker rm -f cucumber_bookies_db'                  // clean up test database container
     }
 
     stage 'upload to docker hub'
+
     sh 'docker login --username=softwarecraftsmanshipcgi --password Welkom01!' // don't store this password here!
     sh 'docker push softwarecraftsmanshipcgi/bookies-2016-app:$(git rev-parse --short HEAD)'
 
-    // checkpoints allow you to continue from this point in the pipeline, useful if you would like to re-deploy
-//    checkpoint ('before deploy staging') // (only available in enterprise edition
     stage 'deploy staging'
-    sh 'ansible-playbook -i /home/ubuntu/euro-bookies-2016/ansible/demo-staging -e "@bookies-2016-app-deployment/bookies-deployment-variables.yml" -e "image_version=$(git rev-parse --short HEAD)" bookies-2016-app-deployment/deploy-application.yml'
+
+    dir('bookies-2016-app-deployment') {
+        sh 'ansible-playbook -i /home/ubuntu/euro-bookies-2016/ansible/staging -e "@bookies-deployment-variables.yml" -e "image_version=$(git rev-parse --short HEAD)" -e ansible_ssh_private_key_file=~/.ssh/workshop_ansiblecc_key deploy-application.yml'
+    }
 
     stage 'load test against staging'
+
     dir('bookies-2016-app-load-test') {
         // run the gatling tests using maven
         sh 'mvn clean install'
     }
 
-    // checkpoints allow you to continue from this point in the pipeline, useful if you would like to re-deploy
-//    checkpoint ('before deploy production') // (only available in enterprise edition
     stage 'deploy production'
-    sh 'ansible-playbook -i /home/ubuntu/euro-bookies-2016/ansible/demo-production -e "@bookies-2016-app-deployment/bookies-deployment-variables.yml" -e "image_version=$(git rev-parse --short HEAD)" bookies-2016-app-deployment/deploy-application.yml'
+
+    dir('bookies-2016-app-deployment') {
+        sh 'ansible-playbook -i /home/ubuntu/euro-bookies-2016/ansible/production -e "@bookies-deployment-variables.yml" -e "image_version=$(git rev-parse --short HEAD)" -e ansible_ssh_private_key_file=~/.ssh/workshop_ansiblecc_key deploy-application.yml'
+    }
 }
 
 /**
@@ -94,4 +100,5 @@ def sendSlack(String message, String emoji) {
 }
 
 def notifyFailure(String message) { sendSlack(message, ":x:"); }
+
 def notifySuccess(String message) { sendSlack(message, ":white_check_mark:"); }
