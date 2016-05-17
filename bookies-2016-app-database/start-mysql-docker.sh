@@ -4,7 +4,7 @@ docker run --name bookies-maria -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -e M
 echo "waiting for container to be ready..."
 sleep 15
 echo "Use flyway to bring the database schema to the latest version (flyway must be on PATH)"
-flyway -user=root -password=root -url=jdbc:mysql://localhost:3306/bookies_db -locations=filesystem:sql migrate
+flyway -user=root -password=root -url="jdbc:mysql://localhost:3306/" -schemas=bookies_db -locations=filesystem:sql migrate
 
 
 echo "RUNNING COMMANDS INSIDE THE CONTAINER"
