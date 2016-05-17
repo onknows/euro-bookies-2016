@@ -1,14 +1,11 @@
 ---
 - hosts: buildserver
   become: yes
-  vars:
-      nodejs_forever: false
-      #jenkins_plugins_extra:
-      #    -
   roles:
     - java
     - tecris.maven
-    - geerlingguy.nodejs
+    - role: geerlingguy.nodejs
+      nodejs_forever: false
     - angstwad.docker_ubuntu
     - george.shuklin.flyway
     - jenkins2
