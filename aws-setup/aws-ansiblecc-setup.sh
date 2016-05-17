@@ -16,6 +16,7 @@ git clone https://github.com/toefel18/euro-bookies-2016.git --single-branch --br
 sudo chown ubuntu. -R euro-bookies-2016
 
 echo "disabling ansible host checking"
-echo "export ANSIBLE_HOST_KEY_CHECKING=False" >> .bashrc
+sudo sh -c 'echo "export ANSIBLE_HOST_KEY_CHECKING=False" > /etc/profile.d/ansible-cfg.sh'
+sudo chmod 755 /etc/profile.d/ansible-cfg.sh
 
 sudo ansible-galaxy install -r euro-bookies-2016/ansible/requirements.yml
