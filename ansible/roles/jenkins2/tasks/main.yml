@@ -1,13 +1,14 @@
 ---
-#- name: overwrite admin password
-#  lineinfile:
-#    dest: /var/lib/jenkins/secretes/initialAdminPassword
-#    owner: jenkins
-#    group: jenkins
-#    mode: 0640
-#    create: yes
-#    regexp: .*
-#    line: "{{ jenkins_admin_password }}"
+- name: overwrite admin password
+  lineinfile:
+    dest: /var/lib/jenkins/secretes/initialAdminPassword
+    owner: jenkins
+    group: jenkins
+    mode: 0640
+    create: yes
+    regexp: .*
+    line: "{{ jenkins_admin_password }}"
+  when: jenkins_set_admin_password
 - name: add the jenkins user to the docker group, so that it can build images
   user:
     name: jenkins

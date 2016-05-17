@@ -1,2 +1,3 @@
 ---
+jenkins_set_admin_password: false
 jenkins_admin_password: admin
