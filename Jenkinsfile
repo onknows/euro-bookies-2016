@@ -55,7 +55,7 @@ pipeline('') {
     // checkpoints allow you to continue from this point in the pipeline, useful if you would like to re-deploy
 //    checkpoint ('before deploy staging') // (only available in enterprise edition
     stage 'deploy staging'
-    sh 'ansible-playbook -i /home/ubuntu/euro-bookies-2016/ansible/demo_staging -e "@bookies-2016-app-deployment/bookies-deployment-variables.yml" -e "image_version=$(git rev-parse --short HEAD)" bookies-2016-app-deployment/deploy-application.yml'
+    sh 'ansible-playbook -i /home/ubuntu/euro-bookies-2016/ansible/demo-staging -e "@bookies-2016-app-deployment/bookies-deployment-variables.yml" -e "image_version=$(git rev-parse --short HEAD)" bookies-2016-app-deployment/deploy-application.yml'
 
     stage 'load test against staging'
     dir('bookies-2016-app-load-test') {
@@ -66,7 +66,7 @@ pipeline('') {
     // checkpoints allow you to continue from this point in the pipeline, useful if you would like to re-deploy
 //    checkpoint ('before deploy production') // (only available in enterprise edition
     stage 'deploy production'
-    sh 'ansible-playbook -i /home/ubuntu/euro-bookies-2016/ansible/demo_production -e "@bookies-2016-app-deployment/bookies-deployment-variables.yml" -e "image_version=$(git rev-parse --short HEAD)" bookies-2016-app-deployment/deploy-application.yml'
+    sh 'ansible-playbook -i /home/ubuntu/euro-bookies-2016/ansible/demo-production -e "@bookies-2016-app-deployment/bookies-deployment-variables.yml" -e "image_version=$(git rev-parse --short HEAD)" bookies-2016-app-deployment/deploy-application.yml'
 }
 
 /**
