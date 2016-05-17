@@ -64,7 +64,7 @@ pipeline('') {
 
     dir('bookies-2016-app-load-test') {
         // run the gatling tests using maven
-        sh 'mvn clean install'
+        sh 'mvn clean install -Dapplication.url=http://localhost:80'
     }
 
     stage 'deploy production'
@@ -95,7 +95,8 @@ def pipeline(String label, Closure body) {
 }
 
 def sendSlack(String message, String emoji) {
-    sh 'curl -X POST --data-urlencode \'payload={"channel": "#builds", "username": "Jenkins-Pipeline", "text": "' + message + '", "icon_emoji": "' + emoji + '"}\' https://hooks.slack.com/services/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'
+    // mute slack for now
+   // sh 'curl -X POST --data-urlencode \'payload={"channel": "#builds", "username": "Jenkins-Pipeline", "text": "' + message + '", "icon_emoji": "' + emoji + '"}\' https://hooks.slack.com/services/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'
 }
 
 def notifyFailure(String message) { sendSlack(message, ":x:"); }
