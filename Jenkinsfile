@@ -6,15 +6,19 @@ pipeline('') {
     stage 'compile & test'
 
     dir('bookies-2016-app') {
-        sh 'npm install'
-        sh 'npm test'
+        notifySlackIfFailed("compile and test") {
+            sh 'npm install'
+            sh 'npm test'
+        }
     }
 
     stage 'Build docker image'
 
     dir('bookies-2016-app') {
-        sh 'docker build --build-arg software_version=$(git rev-parse --short HEAD) --build-arg image_build_timestamp=$(date -u +%Y-%m-%dT%H:%M:%S%Z) -t softwarecraftsmanshipcgi/bookies-2016-app:$(git rev-parse --short HEAD) .'
-        // it would be nice tag the image with latest as well for ease of use!
+        notifySlackIfFailed("building docker image") {
+            sh 'docker build --build-arg software_version=$(git rev-parse --short HEAD) --build-arg image_build_timestamp=$(date -u +%Y-%m-%dT%H:%M:%S%Z) -t softwarecraftsmanshipcgi/bookies-2016-app:$(git rev-parse --short HEAD) .'
+            // it would be nice tag the image with latest as well for ease of use!
+        }
     }
 
     stage 'acceptance test'
@@ -38,9 +42,9 @@ pipeline('') {
         try {
             dir('bookies-2016-app-acceptance-test') {
                 // run a maven build that automatically executes cucumber acceptance tests
-                sh 'mvn clean install -Dapplication.url=http://localhost:7778'
-                // if the build was successful, send a slack notification, otherwise an exception is thrown and catched by the wrapper below
-                notifySuccess("Bookies acceptance test succeeded");
+                notifySlackIfFailed("acceptance test") {
+                    sh 'mvn clean install -Dapplication.url=http://localhost:7778'
+                }
             }
         } finally {
             sh 'docker rm -f cucumber_bookies_app'             // remove the application container, to avoid building up a lot of waste
@@ -51,26 +55,36 @@ pipeline('') {
 
     stage 'upload to docker hub'
 
-    sh 'docker login --username=softwarecraftsmanshipcgi --password Welkom01!' // don't store this password here!
-    sh 'docker push softwarecraftsmanshipcgi/bookies-2016-app:$(git rev-parse --short HEAD)'
+    notifySlackIfFailed("uploading to docker hub") {
+        sh 'docker login --username=softwarecraftsmanshipcgi --password Welkom01!' // don't store this password here!
+        sh 'docker push softwarecraftsmanshipcgi/bookies-2016-app:$(git rev-parse --short HEAD)'
+    }
 
     stage 'deploy staging'
 
     dir('bookies-2016-app-deployment') {
-        sh 'ansible-playbook -i /home/ubuntu/euro-bookies-2016/ansible/staging -e "@bookies-deployment-variables.yml" -e "image_version=$(git rev-parse --short HEAD) app_deployment_dir=$(pwd)"  -e ansible_ssh_private_key_file=~/.ssh/workshop_ansiblecc_key deploy-application.yml'
+        notifySlackIfFailed("deployment to staging") {
+            sh 'ansible-playbook -i /home/ubuntu/euro-bookies-2016/ansible/staging -e "@bookies-deployment-variables.yml" -e "image_version=$(git rev-parse --short HEAD) app_deployment_dir=$(pwd)"  -e ansible_ssh_private_key_file=~/.ssh/workshop_ansiblecc_key deploy-application.yml'
+            notifySuccessViaSlack "New version of bookies deployed to staging"
+        }
     }
 
     stage 'load test against staging'
 
     dir('bookies-2016-app-load-test') {
-        // run the gatling tests using ansible (which calls maven, but ansible knows the host)
-        sh 'ansible-playbook -i /home/ubuntu/euro-bookies-2016/ansible/staging run-gatling.yml'
+        notifySlackIfFailed("load test") {
+            // run the gatling tests using ansible (which calls maven, but ansible knows the host)
+            sh 'ansible-playbook -i /home/ubuntu/euro-bookies-2016/ansible/staging run-gatling.yml'
+        }
     }
 
     stage 'deploy production'
 
     dir('bookies-2016-app-deployment') {
-        sh 'ansible-playbook -i /home/ubuntu/euro-bookies-2016/ansible/production -e "@bookies-deployment-variables.yml" -e "image_version=$(git rev-parse --short HEAD) app_deployment_dir=$(pwd)" -e ansible_ssh_private_key_file=~/.ssh/workshop_ansiblecc_key deploy-application.yml'
+        notifySlackIfFailed("deployment to production") {
+            sh 'ansible-playbook -i /home/ubuntu/euro-bookies-2016/ansible/production -e "@bookies-deployment-variables.yml" -e "image_version=$(git rev-parse --short HEAD) app_deployment_dir=$(pwd)" -e ansible_ssh_private_key_file=~/.ssh/workshop_ansiblecc_key deploy-application.yml'
+            notifySuccessViaSlack "New version of bookies deployed to production"
+        }
     }
 }
 
@@ -87,7 +101,7 @@ def pipeline(String label, Closure body) {
                 body.call()
             } catch (Exception e) {
                 // normally we would include the stacktrace or the exception message, but this is blocked by script-security (must be whitelisted)!
-                notifyFailure("Failure in bookies pipeline, review logging for details");
+                notifyFailureViaSlack("Failure in bookies pipeline, review logging for details");
                 throw e; // rethrow so the build is considered failed
             }
         }
@@ -95,10 +109,18 @@ def pipeline(String label, Closure body) {
 }
 
 def sendSlack(String message, String emoji) {
-    // mute slack for now
-   // sh 'curl -X POST --data-urlencode \'payload={"channel": "#builds", "username": "Jenkins-Pipeline", "text": "' + message + '", "icon_emoji": "' + emoji + '"}\' https://hooks.slack.com/services/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'
+    sh 'curl -X POST --data-urlencode \'payload={"channel": "#builds", "username": "Jenkins-Pipeline", "text": "' + message + '", "icon_emoji": "' + emoji + '"}\' https://hooks.slack.com/services/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'
 }
 
-def notifyFailure(String message) { sendSlack(message, ":x:"); }
+def notifySlackIfFailed(String taskName, Closure body) {
+    try {
+        body.call()
+    } catch (Exception e) {
+        // normally we would include the stacktrace or the exception message, but this is blocked by script-security (must be whitelisted)!
+        notifyFailureViaSlack("${taskName} failed");
+        throw e; // rethrow so the build is considered failed
+    }
+}
 
-def notifySuccess(String message) { sendSlack(message, ":white_check_mark:"); }
+def notifyFailureViaSlack(String message) { sendSlack(message, ":x:"); }
+def notifySuccessViaSlack(String message) { sendSlack(message, ":white_check_mark:"); }
