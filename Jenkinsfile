@@ -70,7 +70,7 @@ pipeline('') {
     stage 'deploy production'
 
     dir('bookies-2016-app-deployment') {
-        sh 'ansible-playbook -i /home/ubuntu/euro-bookies-2016/ansible/production -e "@bookies-deployment-variables.yml" -e "image_version=$(git rev-parse --short HEAD)" -e ansible_ssh_private_key_file=~/.ssh/workshop_ansiblecc_key deploy-application.yml'
+        sh 'ansible-playbook -i /home/ubuntu/euro-bookies-2016/ansible/production -e "@bookies-deployment-variables.yml" -e "image_version=$(git rev-parse --short HEAD) app_deployment_dir=$(pwd)" -e ansible_ssh_private_key_file=~/.ssh/workshop_ansiblecc_key deploy-application.yml'
     }
 }
 
