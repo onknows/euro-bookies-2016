@@ -63,8 +63,8 @@ pipeline('') {
     stage 'load test against staging'
 
     dir('bookies-2016-app-load-test') {
-        // run the gatling tests using maven
-        sh 'mvn clean install -Dapplication.url=http://localhost:80'
+        // run the gatling tests using ansible (which calls maven, but ansible knows the host)
+        sh 'ansible-playbook -i /home/ubuntu/euro-bookies-2016/ansible/staging run-gatling.yml -v'
     }
 
     stage 'deploy production'

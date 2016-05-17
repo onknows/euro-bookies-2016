@@ -13,7 +13,9 @@
   tasks:
     - name: "Updating the database"
       command: flyway -user={{ db_user }} -password={{ db_password }} -url="jdbc:mysql://{{ item }}:{{ db_port }}" -schemas="{{ db_name }}" -locations=filesystem:{{ flyway_migration_location }} migrate
+      register: flywayoutput
       with_inventory_hostnames: db   # loop this task over all databases
+    - debug: msg={{flywayoutput.stdout_lines}}   # when deploying, we would want to see output of the database migration
 
 - hosts: docker
   become: yes
