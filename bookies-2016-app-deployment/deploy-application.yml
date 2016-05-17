@@ -7,6 +7,8 @@
           name: "{{ container_name }}"
           image: "{{ docker_repo }}/{{ image_name }}"
           state: absent                    # the container is removed, otherwise starting with the same name fails later on.
+      register: stopappoutput
+    - debug: var=stopappoutput.msg
 
 # Bring the database up to the newest version
 - hosts: buildserver                       # flyway is located on the build-server, the buildserver connects to the db machines
@@ -15,7 +17,7 @@
       command: flyway -user={{ db_user }} -password={{ db_password }} -url="jdbc:mysql://{{ item }}:{{ db_port }}" -schemas="{{ db_name }}" -locations=filesystem:{{ flyway_migration_location }} migrate
       register: flywayoutput
       with_inventory_hostnames: db   # loop this task over all databases
-    - debug: var={{flywayoutput.stdout_lines}}   # when deploying, we would want to see output of the database migration
+    - debug: var=flywayoutput.results[0].stdout_lines   # when deploying, we would want to see output of the database migration
 
 - hosts: docker
   become: yes
@@ -29,4 +31,6 @@
           state: started
           env:
               DB_CONNECTION_STRING: mysql://{{ db_user }}:{{ db_password }}@{{ item }}:{{ db_port }}/{{ db_name }}
+      register: startappoutput
       with_inventory_hostnames: db   # this works because there is only one item under db that will be mapped to item
+    - debug: var=startappoutput.results[0].msg
