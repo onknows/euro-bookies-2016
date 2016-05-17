@@ -5,3 +5,5 @@
     - name: running gatling performance test
       shell: mvn clean install -Dapplication.url=http://{{ item }}:80
       with_inventory_hostnames: docker
+      register: gatlingoutput
+    - debug: var=gatlingoutput.results[0].stdout_lines
