@@ -1,0 +1,71 @@
+---
+# RUN WITH -e "ec2_access_key=KEY ec2_secret_key=SECRET group_tag=group1"
+
+# We start by creating a security group that opens up several ports in the VPC
+# this grants us SSH and HTTP access. We also opened 8080 so that Jenkins can be
+# reached and 3306 to inspect the database in case of failures. This would look
+# different in production!
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: example ec2 group
+      ec2_group:
+        name: workshop_wide_open
+        description: Opens the ports 22, 80, 8080, 3306 on all machines, for clarity
+        region: eu-west-1
+        rules:
+          - proto: tcp
+            from_port: 80
+            to_port: 80
+            cidr_ip: 0.0.0.0/0
+          - proto: tcp
+            from_port: 22
+            to_port: 22
+            cidr_ip: 0.0.0.0/0
+          - proto: tcp
+            from_port: 8080
+            to_port: 8080
+            cidr_ip: 0.0.0.0/0
+          - proto: tcp
+            from_port: 3306
+            to_port: 3306
+            cidr_ip: 0.0.0.0/0
+        rules_egress:
+          - proto: all
+            from_port: 0
+            to_port: 65535
+            cidr_ip: 0.0.0.0/0
+
+# Start the 5 servers we need for euro_bookies, by default we use the group demo, but
+# this script can be run multiple times with different parameters passed -e "group_tag=group1"
+# in order to create a set of servers for a specific group
+- hosts: localhost
+  connection: local
+  strategy: free
+  gather_facts: False
+  vars:
+    wait_till_running: false
+    key_pair: bookies-test
+    group_tag: demo
+  tasks:
+    - name: running server {{item.tag}}
+      ec2:
+        key_name: "{{ key_pair }}"
+        type: t2.micro
+        image: ami-f95ef58a
+        region: eu-west-1
+        group: workshop_wide_open  # security group!
+        wait: "{{ wait_till_running }}"
+        count: 1
+        user_data: "{{ lookup('file', '{{ item.provision_script }}') }}"  # user_data automatically runs a script when the machine is available, we could also do this using ansible!
+        instance_tags:
+          group: "{{ group_tag }}"
+          type: "{{ item.tag }}"
+      register: ec2
+      with_items:
+        - {tag: 'buildserver',  provision_script: 'aws-ansiblecc-setup.sh'}
+        - {tag: 'acc_docker',   provision_script: 'aws-awsnode-setup.sh'}
+        - {tag: 'acc_database', provision_script: 'aws-awsnode-setup.sh'}
+        - {tag: 'prd_docker',   provision_script: 'aws-awsnode-setup.sh'}
+        - {tag: 'prd_database', provision_script: 'aws-awsnode-setup.sh'}
+    - debug: var=ec2
