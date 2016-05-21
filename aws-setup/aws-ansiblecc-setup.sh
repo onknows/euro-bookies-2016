@@ -15,6 +15,10 @@ git clone https://github.com/toefel18/euro-bookies-2016.git --single-branch --br
 
 sudo chown ubuntu. -R euro-bookies-2016
 
+echo "using the workshop_ansiblecc_key as personal id"
+cp /home/ubuntu/euro-bookies-2016/aws-setup/workshop_ansiblecc_key /home/ubuntu/.ssh/id_rsa
+chmod 400 /home/ubuntu/.ssh/id_rsa
+
 echo "disabling ansible host checking"
 sudo sh -c 'echo "export ANSIBLE_HOST_KEY_CHECKING=False" > /etc/profile.d/ansible-cfg.sh'
 sudo chmod 755 /etc/profile.d/ansible-cfg.sh
