@@ -1,0 +1,29 @@
+---
+# RUN WITH -e "ec2_access_key=KEY ec2_secret_key=SECRET"
+# WORK IN PROGRESS!
+# Automatically configures the right inventories per group
+# this avoids each group having to manually configure their server
+- hosts: tag_type_buildserver
+  gather_facts: yes
+  tasks:
+    - name: remove existing static inventories
+      file:
+        path: "{{ path }}"
+        state: absent
+      with_items:
+       - /home/ubuntu/euro-bookies-2016/ansible/production/production
+       - /home/ubuntu/euro-bookies-2016/ansible/staging/staging
+    - name: configure staging inventory
+      copy:
+        src: groups/{{facts.tag.group}}_staging
+        dest: /home/ubuntu/euro-bookies-2016/ansible/staging/staging
+        owner: ubuntu
+        mode: 666
+    - name: configure production inventory
+      copy:
+        src: groups/{{facts.tag.group}}_production
+        dest: /home/ubuntu/euro-bookies-2016/ansible/production/production
+        owner: ubuntu
+        mode: 666
+
+# TODO use a template and remove all the groups
