@@ -9,7 +9,7 @@
 - hosts: localhost
   connection: local
   tasks:
-    - name: example ec2 group
+    - name: create workshop security group
       ec2_group:
         name: workshop_wide_open
         description: Opens the ports 22, 80, 8080, 3306 on all machines in eu-west-1
@@ -62,6 +62,7 @@
         instance_tags:
           group: "{{ group_tag }}"
           type: "{{ item.tag }}"
+          serverid: "{{ group_tag }}_{{ item.tag }}"
       register: ec2
       with_items:
         - {tag: 'buildserver',  provision_script: 'aws-ansiblecc-setup.sh'}
@@ -69,4 +70,3 @@
         - {tag: 'acc_database', provision_script: 'aws-awsnode-setup.sh'}
         - {tag: 'prd_docker',   provision_script: 'aws-awsnode-setup.sh'}
         - {tag: 'prd_database', provision_script: 'aws-awsnode-setup.sh'}
-#    - debug: var=ec2
