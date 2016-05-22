@@ -20,3 +20,7 @@ tag_serverid_group1_acc_database
 [buildserver:children]
 tag_serverid_group1_buildserver
 
+[allservers:children]
+docker
+db
+buildserver

@@ -1,6 +1,6 @@
 ---
 
-# RUN WITH -e "ec2_access_key=KEY ec2_secret_key=SECRET group_tag=group1"
+# RUN WITH -e "ec2_access_key=KEY ec2_secret_key=SECRET"
 # ansible does not support with_items and playbook includes http://docs.ansible.com/ansible/playbooks_loops.html#loop-control
 # therefore we list multiple includes
 

@@ -1,5 +1,5 @@
 ---
 - hosts: docker  # see the inventory file
   become: yes    # become a sudo user when running this play!
-  roles:         # we depend on other roles
+  roles:         # we depend on other roles that install docker
     - angstwad.docker_ubuntu

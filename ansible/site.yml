@@ -1,4 +1,6 @@
 ---
+# Running this playbook installs a complete environment (staging, production ... ).
+# The playbooks are organized per server type=
 - include: docker.yml
 - include: databases.yml
 - include: buildserver.yml
