@@ -20,3 +20,8 @@ tag_serverid_demo_prd_database
 [buildserver:children]
 tag_serverid_demo_buildserver
 
+[allservers:children]
+docker
+db
+buildserver
+

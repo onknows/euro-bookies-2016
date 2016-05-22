@@ -1,4 +1,7 @@
-# install docker roles from ansible galaxy
+# install roles from ansible galaxy. These roles are created by others and
+# are free for use. This saves us a lot of time. This has already been run
+# for you, but if you make any changes to this file, execute:
+# sudo ansible-galaxy install -r requirements.yml
 - src: angstwad.docker_ubuntu
 - src: tecris.maven
 - src: karlmdavis.jenkins2

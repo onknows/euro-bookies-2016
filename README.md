@@ -22,12 +22,12 @@ The acceptance and production environments consist of:
 ### Getting started
 
 **DONE BY WORKSHOP HOSTS**
- 1. Launch amazon ec2 Ubuntu nodes and use the aws-setup/aws-ansiblecc-setup.sh in the user data field. (This script is run during boot and configures the required software packaged, ssh-access and ansible scripts necessary to get started.)
- 2. Assign each group with a connection string
+ 1. Automatically provision nodes in Amazon EC2 for each group using Ansible
+ 2. Provide each group with the IP addresses of their servers
 
 **DONE BY STUDENTS**
- 1. Connect to the GROUPINFRA-I network (SSH access disabled on GROUPINFRA-C)
- 2. Connect to the ansible control center (ansible cc) using the private key in aws-setup
+ 1. (within CGI) Connect to the GROUPINFRA-I network, because SSH access disabled on GROUPINFRA-C
+ 2. Connect to the buildserver of your group (which is also our ansible control center) using the `workshop_ansiblecc_key` in aws-setup
 
   *connect using ssh*
   ```bash
@@ -37,12 +37,9 @@ The acceptance and production environments consist of:
     * start putty and go to **Connection>SSH>Auth**
     * select private key for authentication
        - browse and choose *aws-setup/aws_ansiblecc_key*
-    * go to **Session** and enter ubuntu@${GROUP_ANSIBLE_IP}
+    * go to **Session** and enter ubuntu@${GROUP_BUILDSERVER_IP}
 
- 3. when connected to the provisioner cd to the project directory containing workshop materials ```cd euro-bookies-2016/ansible```
- 4. execute `setup.sh`, this scripts does the following: 
-       * execute `./download-requirements.sh` (downloads open-source Ansible roles we need)
-       * execute `ssh-keygen -t rsa` to generate a key-pair (choose all defaults, enter no password)
-       * execute `export ANSIBLE_HOST_KEY_CHECKING=False` to disable ssh known_hosts checking 
-       * execute `ansible-playbook -i <inventory-file> install-ssh-key.yml --ask-pass`
- 5. follow instructions from the workshop hosts
+ 3. When connected to the buildserver: cd to the project directory containing the platform scripts ```cd euro-bookies-2016/ansible```
+ 4. Test connectivity with staging servers ```ansible -i staging -m ping allservers```
+ 5. Test connectivity with production servers ```ansible -i production -m ping allservers```
+ 5. Follow the instructions (take a look through the YAML files while waiting, start with site.yml)
