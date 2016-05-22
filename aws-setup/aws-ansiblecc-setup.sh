@@ -8,7 +8,8 @@ echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC7ymBRUodtreE3trfzmhT92VqV1FlvoE60In
 echo "Installs git and the latest version of Ansible"
 sudo apt-add-repository ppa:ansible/ansible -y
 sudo apt-get update
-sudo apt-get install git git-extras software-properties-common ansible -y
+sudo apt-get install git git-extras software-properties-common ansible python-pip -y
+sudo pip install boto
 
 echo "Cloning euro bookies ansible branch"
 git clone https://github.com/toefel18/euro-bookies-2016.git --single-branch --branch ansible
