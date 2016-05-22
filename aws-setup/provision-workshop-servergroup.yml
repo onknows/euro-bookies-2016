@@ -1,17 +1,18 @@
 ---
 # RUN WITH -e "ec2_access_key=KEY ec2_secret_key=SECRET group_tag=group1"
 
-# We start by creating a security group that opens up several ports in the VPC
-# this grants us SSH and HTTP access. We also opened 8080 so that Jenkins can be
-# reached and 3306 to inspect the database in case of failures. This would look
-# different in production!
+# We start by creating a security group that opens up several ports in the VPC to
+# external hosts, this grants us SSH and HTTP access. We also opened 8080 so that
+# Jenkins can be reached and 3306 to inspect the database in case of failures.
+# Use different settings in a real-world production environment
+
 - hosts: localhost
   connection: local
   tasks:
     - name: example ec2 group
       ec2_group:
         name: workshop_wide_open
-        description: Opens the ports 22, 80, 8080, 3306 on all machines, for clarity
+        description: Opens the ports 22, 80, 8080, 3306 on all machines in eu-west-1
         region: eu-west-1
         rules:
           - proto: tcp
@@ -68,4 +69,4 @@
         - {tag: 'acc_database', provision_script: 'aws-awsnode-setup.sh'}
         - {tag: 'prd_docker',   provision_script: 'aws-awsnode-setup.sh'}
         - {tag: 'prd_database', provision_script: 'aws-awsnode-setup.sh'}
-    - debug: var=ec2
+#    - debug: var=ec2
