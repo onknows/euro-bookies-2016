@@ -1,0 +1,26 @@
+# these groups collect servers in aws based on the serverid tags
+# each group has different tags on their servers in order to distinguish them
+
+[tag_serverid_{{ group }}_{{ item.environment }}_docker]
+
+[tag_serverid_{{ group }}_{{ item.environment }}_database]
+
+[tag_serverid_{{ group }}_buildserver]
+
+# However, the platform scripts and the delivery pipeline use generic names,
+# otherwise all pipeline and platform scripts must be updated for each group.
+# the section below defines the generic names as aliasses for the specific groups
+
+[docker:children]
+tag_serverid_{{ group }}_{{ item.environment }}_docker
+
+[db:children]
+tag_serverid_{{ group }}_{{ item.environment }}_database
+
+[buildserver:children]
+tag_serverid_{{ group }}_buildserver
+
+[allservers:children]
+docker
+db
+buildserver

@@ -6,24 +6,16 @@
 - hosts: tag_type_buildserver
   gather_facts: yes
   tasks:
-    - name: remove existing static inventories
-      file:
-        path: "{{ path }}"
-        state: absent
-      with_items:
-       - /home/ubuntu/euro-bookies-2016/ansible/production/production
-       - /home/ubuntu/euro-bookies-2016/ansible/staging/staging
+    - name: Gather ec2 facts
+      action: ec2_facts
+      register: result
+    - debug: var=result
     - name: configure staging inventory
-      copy:
-        src: groups/{{facts.tag.group}}_staging
-        dest: /home/ubuntu/euro-bookies-2016/ansible/staging/staging
-        owner: ubuntu
-        mode: 666
-    - name: configure production inventory
-      copy:
-        src: groups/{{facts.tag.group}}_production
-        dest: /home/ubuntu/euro-bookies-2016/ansible/production/production
-        owner: ubuntu
-        mode: 666
-
-# TODO use a template and remove all the groups
+      template:
+        src: templates/inventory_template.j2
+        dest: "{{ item.target }}"
+        mode: 0664
+      with_items:
+        - { environment: 'acc', target: '/home/ubuntu/euro-bookies-2016/ansible/staging/staging' }
+        - { environment: 'prd', target: '/home/ubuntu/euro-bookies-2016/ansible/production/production' }
+    - debug: var
