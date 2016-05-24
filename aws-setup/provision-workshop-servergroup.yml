@@ -49,6 +49,7 @@
     key_pair: bookies-test
     group_tag: demo
   tasks:
+    - debug: msg="provisioning {{ group_tag }}"
     - name: starting servers
       ec2:
         key_name: "{{ key_pair }}"
