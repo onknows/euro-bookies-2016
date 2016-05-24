@@ -47,7 +47,8 @@ pipeline('') {
                 }
             }
         } finally {
-            sh 'docker rm -f cucumber_bookies_app'             // remove the application container, to avoid building up a lot of waste
+            // remove the application container, to avoid building up a lot of waste
+            sh 'docker rm -f cucumber_bookies_app'
         }
     } finally {
         sh 'docker rm -f cucumber_bookies_db'                  // clean up test database container
@@ -108,8 +109,9 @@ def pipeline(String label, Closure body) {
     }
 }
 
-def sendSlack(String message, String emoji) {
-    sh 'curl -X POST --data-urlencode \'payload={"channel": "#builds", "username": "Jenkins-Pipeline", "text": "' + message + '", "icon_emoji": "' + emoji + '"}\' https://hooks.slack.com/services/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'
+/** rgbColorCode should be in the form of FF0000 (which produces red)*/
+def sendSlack(String message, String rgbColorCode) {
+    sh 'curl -X POST --data-urlencode payload=\'{"channel": "#builds","attachments":[{"fallback": "' + message + '","color": "#' + rgbColorCode + '","fields": [{"short": false,"value": "' + message + '"}],"mrkdwn_in": [ "pretext", "text", "fields"]}]}\' https://cgi-craftsmanship.slack.com/services/hooks/jenkins-ci?token=0YiLVF6DZUkYpXX403Iet104'
 }
 
 def notifySlackIfFailed(String taskName, Closure body) {
@@ -122,5 +124,6 @@ def notifySlackIfFailed(String taskName, Closure body) {
     }
 }
 
-def notifyFailureViaSlack(String message) { sendSlack(message, ":x:"); }
-def notifySuccessViaSlack(String message) { sendSlack(message, ":white_check_mark:"); }
+def notifyFailureViaSlack(String message) { sendSlack(message, "FF0000"); }
+
+def notifySuccessViaSlack(String message) { sendSlack(message, "00FF00"); }
