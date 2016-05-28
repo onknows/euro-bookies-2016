@@ -1,6 +1,22 @@
 ---
-# RUN WITH -e "ec2_access_key=KEY ec2_secret_key=SECRET group_tag=group1"
-
+# Run first if not done already:
+# Requires python 2.7, awscli and boto installed
+# sudo apt-get install python2.7 python-pip
+# sudo pip install pip --upgrade
+# sudo pip install awscli
+# sudo pip install boto
+#
+# aws configure
+#   enter access key and secret based on IAM user
+#   enter region eu-west-1
+#   output format: json
+#
+# include this playbook in another playbook for each group, example:
+# - include: provision-workshop-servergroup.yml group_tag=demo
+#
+# or run
+# ansible-playbookt -e "group_tag=group1" provision-workshop-servergroup.yml
+#
 # We start by creating a security group that opens up several ports in the VPC to
 # external hosts, this grants us SSH and HTTP access. We also opened 8080 so that
 # Jenkins can be reached and 3306 to inspect the database in case of failures.

@@ -1,15 +1,28 @@
 ---
-# Run as follows:
+# Run first if not done already:
+# Requires python 2.7, awscli and boto installed
+# sudo apt-get install python2.7 python-pip
+# sudo pip install pip --upgrade
+# sudo pip install awscli
+# sudo pip install boto
+#
+# aws configure
+#   enter access key and secret based on IAM user
+#   enter region eu-west-1
+#   output format: json
+#
 # ssh-agent bash
 # ssh-add workshop_ansiblecc_key
+# export ANSIBLE_HOST_KEY_CHECKING=False
+#
 # ansible-playbook -i ../ansible/production configure-inventories-for-each-group.yml \
-#           -e "ec2_access_key=KEY ec2_secret_key=SECRET"  \
 #           -e "ansible_read_access_key=READONLY_KEY ansible_read_secret_key=READONLY_SECRET"
 #
 # Automatically configures the right inventories per group this avoids each group having to manually configure their server.
 # The playbook loops over all buildservers, and templates the inventory files out to the servers. The template uses
 # item.environment and ec2_tag_group to derive the correct values.
 # this playbook is idempotent!
+
 - hosts: tag_type_buildserver
   gather_facts: yes
   vars:

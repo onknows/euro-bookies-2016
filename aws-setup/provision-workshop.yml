@@ -1,6 +1,19 @@
 ---
-
-# RUN WITH -e "ec2_access_key=KEY ec2_secret_key=SECRET"
+# Run first if not done already:
+# Requires python 2.7, awscli and boto installed
+# sudo apt-get install python2.7 python-pip
+# sudo pip install pip --upgrade
+# sudo pip install awscli
+# sudo pip install boto
+#
+# aws configure
+#   enter access key and secret based on IAM user
+#   enter region eu-west-1
+#   output format: json
+#
+# then run:
+# ansible-playbook provision-workshop.yml
+#
 # ansible does not support with_items and playbook includes http://docs.ansible.com/ansible/playbooks_loops.html#loop-control
 # therefore we list multiple includes
 
