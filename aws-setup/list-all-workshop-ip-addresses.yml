@@ -1,0 +1,30 @@
+---
+# Run first if not done already:
+# Requires python 2.7, awscli and boto installed
+# sudo apt-get install python2.7 python-pip
+# sudo pip install pip --upgrade
+# sudo pip install awscli
+# sudo pip install boto
+#
+# aws configure
+#   enter access key and secret based on IAM user
+#   enter region eu-west-1
+#   output format: json
+#
+# ssh-agent bash
+# ssh-add workshop_ansiblecc_key
+# export ANSIBLE_HOST_KEY_CHECKING=False
+#
+# then run:
+# ansible-playbook -i ../ansible/production list-all-workshop-ip-addresses.yml | grep msg > ip.txt
+#
+# slack the IP file so everybody is informed
+#
+# Queries all hosts in the cloud and lists the server name and it's IP address. Users need the IP address
+# in order to connect using putty or SSH.
+
+- hosts: all
+  gather_facts: yes
+  tasks:
+    - action: ec2_facts
+    - debug: msg="IP of {{ ec2_tag_serverid }} = {{ ansible_ec2_public_ipv4 }}"
