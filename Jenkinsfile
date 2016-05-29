@@ -3,7 +3,7 @@
 pipeline('') {
     checkout scm
 
-    stage 'compile & test'
+    stage 'compile & test Updated'
 
     dir('bookies-2016-app') {
         notifySlackIfFailed("compile and test") {
