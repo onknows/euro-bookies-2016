@@ -16,7 +16,7 @@
 # export ANSIBLE_HOST_KEY_CHECKING=False
 #
 # then run:
-# ansible-playbook -i ../ansible/production list-all-workshop-ip-addresses.yml | grep msg > ip.txt
+# ansible-playbook -i ../ansible/production list-all-workshop-ip-addresses.yml | grep msg | sort > ip.txt
 #
 # slack the IP file so everybody is informed
 #
