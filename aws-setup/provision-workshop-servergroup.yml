@@ -64,12 +64,13 @@
     wait_till_running: false
     key_pair: bookies-test
     group_tag: demo
+    instance_type: t2.micro
   tasks:
     - debug: msg="provisioning {{ group_tag }}"
     - name: starting servers
       ec2:
         key_name: "{{ key_pair }}"
-        type: t2.micro
+        type: "{{ instance_type }}"
         image: ami-f95ef58a
         region: eu-west-1
         group: workshop_wide_open  # security group!
