@@ -30,7 +30,7 @@ pipelineStep('') {
 
     // start a clean database using the mariadb docker image (The database is configured by providing environment variables using -e)
     // we use the name so we can reference to stop it later
-    sh 'docker run -d --name=cucumber_bookies_db -p 8777:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=bookies_db -e MYSQL_USER=cucumber -e MYSQL_PASSWORD=cucumber mariadb'
+    sh 'docker run -d --name=cucumber_bookies_db_feature_bets -p 8777:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=bookies_db -e MYSQL_USER=cucumber -e MYSQL_PASSWORD=cucumber mariadb'
     try {
         // update the database to the latest version using flyway. The database might not be up yet on slow nodes, so try 3 times
         retry(3) {
@@ -43,7 +43,7 @@ pipelineStep('') {
 
         // start the application and connect it to our test database, we cannot use localhost as the IP, that would not be able to go outside the container
         // to get the ip address we use $(ip route get 8.8.8.8 | head -1 | cut -d' ' -f8)
-        sh 'docker run -d --name=cucumber_bookies_app -p 8778:8080 -e DB_CONNECTION_STRING=mysql://cucumber:cucumber@$(ip route get 8.8.8.8 | head -1 | cut -d\' \' -f8):8777/bookies_db softwarecraftsmanshipcgi/bookies-2016-app:$(git rev-parse --short HEAD)'
+        sh 'docker run -d --name=cucumber_bookies_app_feature_bets -p 8778:8080 -e DB_CONNECTION_STRING=mysql://cucumber:cucumber@$(ip route get 8.8.8.8 | head -1 | cut -d\' \' -f8):8777/bookies_db softwarecraftsmanshipcgi/bookies-2016-app:$(git rev-parse --short HEAD)'
         try {
             dir('bookies-2016-app-acceptance-test') {
                 // run a maven build that automatically executes cucumber acceptance tests
@@ -53,10 +53,10 @@ pipelineStep('') {
             }
         } finally {
             // remove the application container, to avoid building up a lot of waste
-            sh 'docker rm -f cucumber_bookies_app'
+            sh 'docker rm -f cucumber_bookies_app_feature_bets'
         }
     } finally {
-        sh 'docker rm -f cucumber_bookies_db'                  // clean up test database container
+        sh 'docker rm -f cucumber_bookies_db_feature_bets'                  // clean up test database container
     }
 }
 
