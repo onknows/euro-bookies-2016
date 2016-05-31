@@ -23,7 +23,7 @@ pipeline('') {
     }
 }
 
-stage name: 'acceptance test', concurrency: 1
+stage 'acceptance test', concurrency: 1
 pipeline('') {
 
     // start a clean database using the mariadb docker image (The database is configured by providing environment variables using -e)
@@ -67,7 +67,7 @@ pipeline('') {
     }
 }
 
-stage name: 'deploy staging', concurrency: 1
+stage 'deploy staging', concurrency: 1
 pipeline('') {
 
     dir('bookies-2016-app-deployment') {
@@ -82,7 +82,7 @@ pipeline('') {
 parallel(
         loadtest:
             pipeline('') {
-                stage  name: 'load test against staging', concurrency: 1
+                stage 'load test against staging', concurrency: 1
                 dir('bookies-2016-app-load-test') {
                     notifySlackIfFailed("load test") {
                         // run the gatling tests using ansible (which calls maven, but ansible knows the host)
@@ -92,7 +92,7 @@ parallel(
             },
         deployProduction:
             pipeline('') {
-                stage name: 'deploy production', concurrency: 1
+                stage 'deploy production', concurrency: 1
                 input "Deploy to production?"
                 dir('bookies-2016-app-deployment') {
                     notifySlackIfFailed("deployment to production") {
