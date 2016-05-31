@@ -1,7 +1,8 @@
 #!groovy
 
 stage 'compile & test'
-pipeline('') {
+
+pipelineStep('') {
     checkout scm
 
     dir('bookies-2016-app') {
@@ -13,7 +14,8 @@ pipeline('') {
 }
 
 stage 'Build docker image'
-pipeline('') {
+
+pipelineStep('') {
     dir('bookies-2016-app') {
         notifySlackIfFailed("building docker image") {
             sh 'docker build --build-arg software_version=$(git rev-parse --short HEAD) --build-arg image_build_timestamp=$(date -u +%Y-%m-%dT%H:%M:%S%Z) -t softwarecraftsmanshipcgi/bookies-2016-app:$(git rev-parse --short HEAD) .'
@@ -22,8 +24,9 @@ pipeline('') {
     }
 }
 
-stage 'acceptance test'
-pipeline('') {
+stage name: 'acceptance test', concurrency: 1
+
+pipelineStep('') {
 
     // start a clean database using the mariadb docker image (The database is configured by providing environment variables using -e)
     // we use the name so we can reference to stop it later
@@ -58,7 +61,8 @@ pipeline('') {
 }
 
 stage 'upload to docker hub'
-pipeline('') {
+
+pipelineStep('') {
 
     notifySlackIfFailed("uploading to docker hub") {
         sh 'docker login --username=softwarecraftsmanshipcgi --password Welkom01!' // don't store this password here!
@@ -66,8 +70,9 @@ pipeline('') {
     }
 }
 
-stage 'deploy staging'
-pipeline('') {
+stage name: 'deploy staging', concurrency: 1
+
+pipelineStep('') {
 
     dir('bookies-2016-app-deployment') {
         notifySlackIfFailed("deployment to staging") {
@@ -77,8 +82,9 @@ pipeline('') {
     }
 }
 
-stage 'load test against staging'
-pipeline('') {
+stage name: 'load test against staging', concurrency: 1
+
+pipelineStep('') {
 
     dir('bookies-2016-app-load-test') {
         notifySlackIfFailed("load test") {
@@ -88,8 +94,9 @@ pipeline('') {
     }
 }
 
-stage 'deploy production'
-pipeline('') {
+stage name: 'deploy production', concurrency: 1
+
+pipelineStep('') {
     input "Deploy to production?"
     dir('bookies-2016-app-deployment') {
         notifySlackIfFailed("deployment to production") {
@@ -99,20 +106,22 @@ pipeline('') {
     }
 }
 
+
+
 /**
- * Wrapper around the body of a node, so that we can detect pipeline failures and take some actions.
- * to unwrap: remove this method replace 'pipeline' with 'node'
+ * Wrapper around the body of a node, so that we can detect failures and take action (like messaging).
+ * to unwrap: remove this method and replace 'pipelineStep' with 'node'
  *
  * Idea is taken from: http://stackoverflow.com/questions/36837683/how-to-perform-actions-for-failed-builds-in-jenkinsfile
  */
-def pipeline(String label, Closure body) {
+def pipelineStep(String label, Closure body) {
     node(label) {
         wrap([$class: 'TimestamperBuildWrapper']) {
             try {
                 body.call()
             } catch (Exception e) {
                 // normally we would include the stacktrace or the exception message, but this is blocked by script-security (must be whitelisted)!
-                notifyFailureViaSlack("Failure in bookies pipeline, review logging for details");
+                notifyFailureViaSlack("Failure in bookies pipelineStep, review logging for details");
                 throw e; // rethrow so the build is considered failed
             }
         }
