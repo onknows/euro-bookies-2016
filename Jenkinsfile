@@ -1,9 +1,8 @@
 #!groovy
 
+stage 'compile & test'
 pipeline('') {
     checkout scm
-
-    stage 'compile & test'
 
     dir('bookies-2016-app') {
         notifySlackIfFailed("compile and test") {
@@ -11,17 +10,20 @@ pipeline('') {
             sh 'npm test'
         }
     }
+}
 
-    stage 'Build docker image'
-
+stage 'Build docker image'
+pipeline('') {
     dir('bookies-2016-app') {
         notifySlackIfFailed("building docker image") {
             sh 'docker build --build-arg software_version=$(git rev-parse --short HEAD) --build-arg image_build_timestamp=$(date -u +%Y-%m-%dT%H:%M:%S%Z) -t softwarecraftsmanshipcgi/bookies-2016-app:$(git rev-parse --short HEAD) .'
             // it would be nice tag the image with latest as well for ease of use!
         }
     }
+}
 
-    stage 'acceptance test'
+stage 'acceptance test'
+pipeline('') {
 
     // start a clean database using the mariadb docker image (The database is configured by providing environment variables using -e)
     // we use the name so we can reference to stop it later
@@ -53,15 +55,19 @@ pipeline('') {
     } finally {
         sh 'docker rm -f cucumber_bookies_db'                  // clean up test database container
     }
+}
 
-    stage 'upload to docker hub'
+stage 'upload to docker hub'
+pipeline('') {
 
     notifySlackIfFailed("uploading to docker hub") {
         sh 'docker login --username=softwarecraftsmanshipcgi --password Welkom01!' // don't store this password here!
         sh 'docker push softwarecraftsmanshipcgi/bookies-2016-app:$(git rev-parse --short HEAD)'
     }
+}
 
-    stage 'deploy staging'
+stage 'deploy staging'
+pipeline('') {
 
     dir('bookies-2016-app-deployment') {
         notifySlackIfFailed("deployment to staging") {
@@ -69,8 +75,10 @@ pipeline('') {
             notifySuccessViaSlack "New version of bookies deployed to staging"
         }
     }
+}
 
-    stage 'load test against staging'
+stage 'load test against staging'
+pipeline('') {
 
     dir('bookies-2016-app-load-test') {
         notifySlackIfFailed("load test") {
@@ -78,8 +86,10 @@ pipeline('') {
             sh 'ansible-playbook -i /home/ubuntu/euro-bookies-2016/ansible/staging run-gatling.yml'
         }
     }
+}
 
-    stage 'deploy production'
+stage 'deploy production'
+pipeline('') {
     input "Deploy to production?"
     dir('bookies-2016-app-deployment') {
         notifySlackIfFailed("deployment to production") {
