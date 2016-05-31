@@ -130,7 +130,7 @@ def pipelineStep(String label, Closure body) {
 
 /** rgbColorCode should be in the form of FF0000 (which produces red)*/
 def sendSlack(String message, String rgbColorCode) {
-    sh 'curl -X POST --data-urlencode payload=\'{"channel": "#builds","attachments":[{"fallback": "' + message + '","color": "#' + rgbColorCode + '","fields": [{"short": false,"value": "' + message + '"}],"mrkdwn_in": [ "pretext", "text", "fields"]}]}\' https://cgi-craftsmanship.slack.com/services/hooks/jenkins-ci?token=0YiLVF6DZUkYpXX403Iet104'
+    sh 'curl -X POST --data-urlencode payload=\'{"channel": "#builds","attachments":[{"fallback": "\'"$BRANCH_NAME"\': ' + message + '","color": "#' + rgbColorCode + '","fields": [{"short": false,"value": "\'"$BRANCH_NAME"\': ' + message + '"}],"mrkdwn_in": [ "pretext", "text", "fields"]}]}\' https://cgi-craftsmanship.slack.com/services/hooks/jenkins-ci?token=0YiLVF6DZUkYpXX403Iet104'
 }
 
 def notifySlackIfFailed(String taskName, Closure body) {
