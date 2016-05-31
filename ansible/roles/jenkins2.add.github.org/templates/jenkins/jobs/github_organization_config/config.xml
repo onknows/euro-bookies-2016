@@ -48,8 +48,8 @@
     </orphanedItemStrategy>
     <triggers>
         <com.cloudbees.hudson.plugins.folder.computed.PeriodicFolderTrigger plugin="cloudbees-folder@5.9">
-            <spec>* * * * *</spec>
-            <interval>60000</interval>
+            <spec>{{ periodic_folder_trigger_pattern }}</spec>
+            <interval>{{ 86400000 }}</interval>
         </com.cloudbees.hudson.plugins.folder.computed.PeriodicFolderTrigger>
     </triggers>
     <navigators>
