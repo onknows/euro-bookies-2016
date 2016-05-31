@@ -1,6 +1,7 @@
 package nl.toefel.bookies.acceptancetest;
 
 import com.google.gson.reflect.TypeToken;
+import cucumber.api.PendingException;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -18,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Christophe Hesters
  */
-public class TeamsStepDefinitions {
+public class StepDefinitions {
 
     public static TestContext context = TestContext.createAutoConfigured();
 
@@ -76,5 +77,10 @@ public class TeamsStepDefinitions {
     @When("^i delete the team with countryCode \"([^\"]*)\"$")
     public void iDeleteTheTeamWithCountryCode(String countryCode) throws Throwable {
         response = request(context.baseUrl() + "/api/teams/" + countryCode).delete();
+    }
+
+    @When("^i request all bets$")
+    public void iRequestAllBets() throws Throwable {
+        response = request(context.baseUrl() + "/api/bets").get();
     }
 }
