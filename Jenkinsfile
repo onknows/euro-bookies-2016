@@ -1,4 +1,5 @@
 #!groovy
+import org.apache.tools.ant.taskdefs.Parallel
 
 stage 'compile & test'
 pipeline('') {
@@ -22,7 +23,7 @@ pipeline('') {
     }
 }
 
-stage 'acceptance test'
+stage 'acceptance test', concurrency: 1
 pipeline('') {
 
     // start a clean database using the mariadb docker image (The database is configured by providing environment variables using -e)
@@ -66,7 +67,7 @@ pipeline('') {
     }
 }
 
-stage 'deploy staging'
+stage 'deploy staging', concurrency: 1
 pipeline('') {
 
     dir('bookies-2016-app-deployment') {
@@ -77,27 +78,30 @@ pipeline('') {
     }
 }
 
-stage 'load test against staging'
-pipeline('') {
 
-    dir('bookies-2016-app-load-test') {
-        notifySlackIfFailed("load test") {
-            // run the gatling tests using ansible (which calls maven, but ansible knows the host)
-            sh 'ansible-playbook -i /home/ubuntu/euro-bookies-2016/ansible/staging run-gatling.yml'
-        }
-    }
-}
-
-stage 'deploy production'
-pipeline('') {
-    input "Deploy to production?"
-    dir('bookies-2016-app-deployment') {
-        notifySlackIfFailed("deployment to production") {
-            sh 'ansible-playbook -i /home/ubuntu/euro-bookies-2016/ansible/production -e "@bookies-deployment-variables.yml" -e "image_version=$(git rev-parse --short HEAD) app_deployment_dir=$(pwd)" -e ansible_ssh_private_key_file=~/.ssh/workshop_ansiblecc_key deploy-application.yml'
-            notifySuccessViaSlack "New version of bookies deployed to production"
-        }
-    }
-}
+parallel(
+        loadtest:
+            pipeline('') {
+                stage 'load test against staging', concurrency: 1
+                dir('bookies-2016-app-load-test') {
+                    notifySlackIfFailed("load test") {
+                        // run the gatling tests using ansible (which calls maven, but ansible knows the host)
+                        sh 'ansible-playbook -i /home/ubuntu/euro-bookies-2016/ansible/staging run-gatling.yml'
+                    }
+                }
+            },
+        deployProduction:
+            pipeline('') {
+                stage 'deploy production', concurrency: 1
+                input "Deploy to production?"
+                dir('bookies-2016-app-deployment') {
+                    notifySlackIfFailed("deployment to production") {
+                        sh 'ansible-playbook -i /home/ubuntu/euro-bookies-2016/ansible/production -e "@bookies-deployment-variables.yml" -e "image_version=$(git rev-parse --short HEAD) app_deployment_dir=$(pwd)" -e ansible_ssh_private_key_file=~/.ssh/workshop_ansiblecc_key deploy-application.yml'
+                        notifySuccessViaSlack "New version of bookies deployed to production"
+                    }
+                }
+            }
+)
 
 /**
  * Wrapper around the body of a node, so that we can detect pipeline failures and take some actions.
