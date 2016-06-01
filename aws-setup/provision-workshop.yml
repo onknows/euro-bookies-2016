@@ -17,7 +17,7 @@
 # ansible does not support with_items and playbook includes http://docs.ansible.com/ansible/playbooks_loops.html#loop-control
 # therefore we list multiple includes
 
-- include: provision-workshop-servergroup.yml group_tag=demo instance_type=m4.xlarge
+- include: provision-workshop-servergroup.yml group_tag=demo
 - include: provision-workshop-servergroup.yml group_tag=group1
 - include: provision-workshop-servergroup.yml group_tag=group2
 - include: provision-workshop-servergroup.yml group_tag=group3
@@ -35,3 +35,4 @@
 - include: provision-workshop-servergroup.yml group_tag=group15
 - include: provision-workshop-servergroup.yml group_tag=group16
 - include: provision-workshop-servergroup.yml group_tag=group17
+- include: provision-workshop-servergroup.yml group_tag=group18

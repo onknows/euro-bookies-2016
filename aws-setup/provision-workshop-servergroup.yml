@@ -64,7 +64,8 @@
     wait_till_running: false
     key_pair: bookies-test
     group_tag: demo
-    instance_type: t2.micro
+#   instance_type: t2.micro
+    instance_type: m4.xlarge
   tasks:
     - debug: msg="provisioning {{ group_tag }}"
     - name: starting servers
