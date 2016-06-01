@@ -6,8 +6,6 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
-import static javafx.scene.input.KeyCode.M;
-
 /**
  * Utility functions that make code easier to read.
  *
