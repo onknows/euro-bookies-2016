@@ -1,6 +1,7 @@
 ---
 repo_owner: toefel18
 owner_name: Christophe Hesters
+repo_pattern: euro-bookies-2016
 avatar: https://avatars.githubusercontent.com/u/11518461?v=3
 periodic_folder_trigger_pattern: H H * * *
 periodic_folder_trigger_interval: 86400000
