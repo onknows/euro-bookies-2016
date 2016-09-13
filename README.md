@@ -35,13 +35,17 @@ The acceptance and production environments consist of:
  5. We now have a bunch of servers, each with their unique tags. Now we need configure the servers of each group so that they can find each other by writing the access key and appropriate tag info in the inventories of each group's buildserver . Wait a while for cloud-init to complete (takes approx 2 minutes, for certainty check the `/var/log/cloud-init.log` on a buildserver). Then fill in the AmazonEC2ReadOnlyAccess account credentials and execute: 
  
     ```bash
+    # We must use the workshop private key to connect to the servers, this is the only way in!
+    ssh-agent bash
+    ssh-add workshop_ansiblecc_key
+
     ansible-playbook -i ../ansible/production configure-inventories-for-each-group.yml -e "ansible_read_access_key=<READONLY_KEY> ansible_read_secret_key=<READONLY_SECRET>"
     ```
     
- 6. Provide each group with the IP addresses of their servers
+ 6. Provide each group with the IP addresses of their servers, the pipes strip away unnecessary info:
  
     ```bash
-    ansible-playbook -i ../ansible/production list-all-workshop-ip-addresses.yml | grep msg | sort | tee > ip.txt
+    ansible-playbook -i ../ansible/production list-all-workshop-ip-addresses.yml | grep msg | sort | cut -c 13- | sed 's/.$//' | tee /tmp/ip.txt
     ```
 
 **DONE BY STUDENTS**
