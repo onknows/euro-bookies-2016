@@ -22,19 +22,34 @@ The acceptance and production environments consist of:
 ### Getting started
 
 **DONE BY WORKSHOP HOSTS**
- 1. Create a new IAM user in Amazon AWS, and attach the security policy `AmazonEC2FullAccess` or `AmazonEC2ReadOnlyAccess`, download the credentials
- 2. Configure aws_access_key_id and aws_secret_access_key in ```ansible/staging/ec2.ini``` and ```ansible/production/ec2.ini```
- 3. Commit! (otherwise all users won't have access)
- 4. Automatically provision nodes in Amazon EC2 for each group using Ansible
+ 1. Create a new IAM user in Amazon AWS, and attach the security policy `AmazonEC2FullAccess` and another with `AmazonEC2ReadOnlyAccess`, download the credentials
+ 2. Install awscli see [prvision-workshop.yml](aws-setup/provision-workshop.yml) documentation
+ 3. On the command line, execute: `aws configure` and configure the credentials of the account with AmazonEC2FullAccess rights, leave region (eu-west-1) and output format (json) as is.
+ 4. Automatically create and start nodes in Amazon EC2 for each group using Ansible
   
     ```bash 
     cd aws-setup
-    ansible-playbook provision-workshop.yml -e "ec2_access_key=<KEY> ec2_secret_key=<SECRET>"
+    ansible-playbook provision-workshop.yml"
     ```
     
- 5. Provide each group with the IP addresses of their servers
+ 5. We now have a bunch of servers, each with their unique tags. Now we need configure the servers of each group so that they can find each other by writing the access key and appropriate tag info in the inventories of each group's buildserver . Wait a while for cloud-init to complete (takes approx 2 minutes, for certainty check the `/var/log/cloud-init.log` on a buildserver). Then fill in the AmazonEC2ReadOnlyAccess account credentials and execute: 
+ 
+    ```bash
+    ansible-playbook -i ../ansible/production configure-inventories-for-each-group.yml -e "ansible_read_access_key=<READONLY_KEY> ansible_read_secret_key=<READONLY_SECRET>"
+    ```
+    
+ 6. Provide each group with the IP addresses of their servers
+ 
+    ```bash
+    ansible-playbook -i ../ansible/production list-all-workshop-ip-addresses.yml | grep msg | sort | tee > ip.txt
+    ```
 
 **DONE BY STUDENTS**
+ 
+ Please view [these sheets with instructions and exercises](https://docs.google.com/presentation/d/1ZwmTWrq3mVdq0S4bg9DYqjiLdbOjx64fBzh9Ao4T0Cg/edit?usp=sharing) and skip the steps below.  
+ 
+ 
+ 
  1. (within CGI) Connect to the GROUPINFRA-I network, because SSH access disabled on GROUPINFRA-C
  2. Connect to the buildserver of your group (which is also our ansible control center) using the `workshop_ansiblecc_key` in aws-setup
 
