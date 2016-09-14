@@ -3,12 +3,12 @@ package nl.toefel.bookies.acceptancetest;
 import de.galan.flux.HttpClientException;
 
 import static de.galan.flux.Flux.request;
-import static nl.toefel.bookies.acceptancetest.TeamsStepDefinitions.context;
+import static nl.toefel.bookies.acceptancetest.StepDefinitions.context;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Cucumber tests need some context information, like the URL to context on. This class loads the parameters passed
- * as -D arguments or uses a sensible defaults. The TeamsStepDefinitions can then use an an instance of this class without
+ * as -D arguments or uses a sensible defaults. The StepDefinitions can then use an an instance of this class without
  * having to worry what value to use.
  *
  * @author Christophe Hesters

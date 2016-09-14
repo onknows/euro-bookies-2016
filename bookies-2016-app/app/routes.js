@@ -86,4 +86,11 @@ exports.registerRoutes = function(app, dao) {
             });
         }
     });
+
+    app.get('/api/bets', function (req, res) {
+        console.log("GET /api/bets");
+        dao.getAllBets(function (jsonResult) {
+            res.json(jsonResult);
+        });
+    });
 };

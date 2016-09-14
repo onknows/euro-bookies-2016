@@ -1,0 +1,11 @@
+INSERT INTO bets (team, amount) VALUES ('NL', 100);
+INSERT INTO bets (team, amount) VALUES ('NL', 300);
+INSERT INTO bets (team, amount) VALUES ('NL', 600);
+INSERT INTO bets (team, amount) VALUES ('NL', 50);
+INSERT INTO bets (team, amount) VALUES ('DE', 30);
+INSERT INTO bets (team, amount) VALUES ('DE', 71);
+INSERT INTO bets (team, amount) VALUES ('DE', 55);
+INSERT INTO bets (team, amount) VALUES ('BE', 771);
+INSERT INTO bets (team, amount) VALUES ('BE', 555);
+INSERT INTO bets (team, amount) VALUES ('ES', 148);
+INSERT INTO bets (team, amount) VALUES ('ES', 498);

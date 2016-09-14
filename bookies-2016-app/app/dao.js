@@ -121,4 +121,22 @@ Dao.prototype.removeTeam = function(countryCode, callback) {
     });
 };
 
+/**
+ * Gets all bets from the database
+ *
+ * @param callback a callback function that takes a String containing the JSON result
+ */
+Dao.prototype.getAllBets = function(callback) {
+    var connection = this.newConnection();
+    connection.query('SELECT * FROM bets', function(err, rows, fields) {
+        if (err) {
+            console.log('error in getAllBets: ' + err.message);
+            throw err;
+        }
+        callback(rows);
+        connection.end();
+    });
+};
+
+
 module.exports = Dao;
