@@ -21,18 +21,21 @@ The acceptance and production environments consist of:
 
 ### Getting started
 
-**DONE BY WORKSHOP HOSTS**
- 1. Create a new IAM user in Amazon AWS, and attach the security policy `AmazonEC2FullAccess` and another with `AmazonEC2ReadOnlyAccess`, download the credentials
- 2. Install awscli see [prvision-workshop.yml](aws-setup/provision-workshop.yml) documentation
- 3. On the command line, execute: `aws configure` and configure the credentials of the account with AmazonEC2FullAccess rights, leave region (eu-west-1) and output format (json) as is.
- 4. Automatically create and start nodes in Amazon EC2 for each group using Ansible
+Assuming you are working on Linux. If you don't have linux, create a VM or cloud instance manually.
+
+**Setting up the environment in ansible**
+ 1. Create a new IAM (Identity and Access Management) user named *ansible-all* in Amazon AWS, and attach the security policy `AmazonEC2FullAccess`, download the credentials. 
+ 2. Create nother user ansible-read with `AmazonEC2ReadOnlyAccess`, download the credentials
+ 3. Install awscli, [see online docs](http://docs.aws.amazon.com/cli/latest/userguide/installing.html)
+ 4. On the command line, execute: `aws configure` and configure the credentials of the account with the credentials of ansible-all (which has AmazonEC2FullAccess rights), leave region (eu-west-1) and output format (json) as is.
+ 5. Automatically create and start nodes in Amazon EC2 for each group using Ansible using the commands below. Open provistion-workshop and comment the groups you don't want to create: 
   
     ```bash 
     cd aws-setup
     ansible-playbook provision-workshop.yml"
     ```
     
- 5. We now have a bunch of servers, each with their unique tags. Now we need configure the servers of each group so that they can find each other by writing the access key and appropriate tag info in the inventories of each group's buildserver . Wait a while for cloud-init to complete (takes approx 2 minutes, for certainty check the `/var/log/cloud-init.log` on a buildserver). Then fill in the AmazonEC2ReadOnlyAccess account credentials and execute: 
+ 6. We now have a bunch of servers, each with their unique tags. Now we need configure the servers of each group so that they can find each other by writing the access key and appropriate tag info in the inventories of each group's buildserver . Wait a while for cloud-init to complete (takes approx 2 minutes, for certainty check the `/var/log/cloud-init.log` on a buildserver). Then fill in the AmazonEC2ReadOnlyAccess account credentials and execute: 
  
     ```bash
     # We must use the workshop private key to connect to the servers, this is the only way in!
@@ -42,7 +45,7 @@ The acceptance and production environments consist of:
     ansible-playbook -i ../ansible/production configure-inventories-for-each-group.yml -e "ansible_read_access_key=<READONLY_KEY> ansible_read_secret_key=<READONLY_SECRET>"
     ```
     
- 6. Provide each group with the IP addresses of their servers, the pipes strip away unnecessary info:
+ 7. Provide each group with the IP addresses of their servers, the pipes strip away unnecessary info:
  
     ```bash
     ansible-playbook -i ../ansible/production list-all-workshop-ip-addresses.yml | grep msg | sort | cut -c 13- | sed 's/.$//' | tee /tmp/ip.txt

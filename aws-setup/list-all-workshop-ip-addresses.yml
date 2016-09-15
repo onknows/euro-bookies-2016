@@ -16,9 +16,7 @@
 # export ANSIBLE_HOST_KEY_CHECKING=False
 #
 # then run:
-# ansible-playbook -i ../ansible/production list-all-workshop-ip-addresses.yml | grep msg | sort > ip.txt
-#
-# slack the IP file so everybody is informed
+# ansible-playbook -i ../ansible/production list-all-workshop-ip-addresses.yml | grep msg | sort | cut -c 13- | sed 's/.$//' | tee /tmp/ip.txt
 #
 # Queries all hosts in the cloud and lists the server name and it's IP address. Users need the IP address
 # in order to connect using putty or SSH.
