@@ -15,6 +15,9 @@ Small REST application which people can use to bet on EK teams, purpose is to de
            * docker server
            * database server
 
+
+See [the ansible branch documentation](https://github.com/toefel18/euro-bookies-2016/tree/ansible) how to set-up this environment in AWS yourself.
+
 # Repository layout
 
   * bookies-2016-app contains the nodejs application
